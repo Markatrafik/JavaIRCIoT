@@ -21,7 +21,7 @@ public class JLayerIRC {
 
   public static class init_CONST {
    //
-   public String irciot_library_version = "0.0.160";
+   public String irciot_library_version = "0.0.161";
    //
    public String irciot_protocol_version = "0.3.29";
    //
