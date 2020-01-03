@@ -11,4 +11,6 @@
 *.rar
 *~
 build.sh
+examples/
+examples/*.java
 hs_err_pid*
