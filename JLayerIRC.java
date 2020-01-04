@@ -19,7 +19,7 @@ public class JLayerIRC {
   //
   public static final boolean DO_debug_library  = false;
 
-  public static class init_CONST {
+  public static final class init_CONST {
    //
    public String irciot_library_version = "0.0.161";
    //
@@ -402,9 +402,21 @@ public class JLayerIRC {
        this.code_MAPMORE    = "610";
      };
    };
+  };
+
+  public final static init_CONST CONST = new init_CONST();
+
+  public JLayerIRC() { // Class constructor
+    //
 
   };
-  
-  public static init_CONST CONST = new init_CONST();
-  
+
+  public String irciot_protocol_version() {
+    return this.CONST.irciot_protocol_version;
+  };
+
+  public String irciot_library_version() {
+    return this.CONST.irciot_library_version;
+  };
+
 }

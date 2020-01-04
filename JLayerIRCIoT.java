@@ -13,6 +13,8 @@
  
 package JavaIRCIoT;
 
+import java.util.HashMap;
+
 public class JLayerIRCIoT {
 
   // Those Global options override default behavior and memory usage:
@@ -33,7 +35,7 @@ public class JLayerIRCIoT {
   public static final boolean DO_auto_blockchain = false;
   public static final boolean DO_auto_compress   = false;
 
-  public static class init_CONST {
+  public static final class init_CONST {
    //
    public String irciot_library_version = "0.0.161";
    //
@@ -289,7 +291,66 @@ public class JLayerIRCIoT {
    public int err_LOAD_USER_SIGN      = 755;
    public int err_LOAD_USER_CRYPT     = 777;
    //
-
+   public HashMap<Integer, String> err_DESCRIPTIONS = new HashMap<Integer, String>() {{
+     put( err_PROTO_VER_MISMATCH, "Protocol version mismatch" );
+     put( err_LIB_VER_MISMATCH,   "Library version mismatch" );
+     put( err_BASE64_DECODING,    "BASE64 decoding" );
+     put( err_BASE85_DECODING,    "BASE85 decoding" );
+     put( err_BASE32_DECODING,    "BASE32 decoding" );
+     put( err_DEFRAG_INVALID_DID, "Invalid 'dp' when defragmenting" );
+     put( err_CONTENT_MISSMATCH,  "Content missmatch" );
+     put( err_DEFRAG_OP_MISSING,  "No tag 'op' when defragmenting" );
+     put( err_DEFRAG_DP_MISSING,  "No tag 'dp' when defragmenting" );
+     put( err_DEFRAG_BP_MISSING,  "No tag 'bp' when defragmenting" );
+     put( err_DEFRAG_OC_EXCEEDED, "Exceeded 'oc' field value" );
+     put( err_DEFRAG_DC_EXCEEDED, "Exceeded 'dc' field value" );
+     put( err_DEFRAG_BC_EXCEEDED, "Exceeded 'bc' field value" );
+     put( err_OVERLAP_MISSMATCH,  "Overlapping fragments missmatch" );
+     put( err_COMP_ZLIB_HEADER,   "Invalid Zlib header" );
+     put( err_COMP_ZLIB_INCOMP,   "Zlib incomplete block" );
+     put( err_RSA_KEY_FORMAT,     "Invalid RSA Key format" );
+     put( err_LOAD_ZLIB_MODULE,   "Loading Zlib module" );
+     put( err_LOAD_BZIP2_MODULE,  "Loading BZIP2 module" );
+     put( err_LOAD_RSA_MODULE,    "Loading RSA module" );
+     put( err_LOAD_AES_MODULE,    "Loading AES module" );
+     put( err_LOAD_2FISH_MODULE,  "Loading Twofish module" );
+     put( err_LOAD_USER_SIGN,     "Loading UserSign module" );
+     put( err_LOAD_USER_CRYPT,    "Loading UserCrypt module" );
+     put( err_LDICT_VERIFY_OK,    "Local Dictionary verification OK" );
+     put( err_LDICT_VERIFY_FAIL,  "Local Dictionary verification failed" );
+   }};
+   //
+   public byte pattern = 0; // or 64 "@", 255
+   //
+   // Default Maximum IRC message size (in bytes)
+   //
+   public int default_mtu = 450; // Undernet IRCd at 2019
+   //
+   // Fragmented Message Delete Timeout (in seconds)
+   //
+   public int FMDT = 3600;
+   //
+   // Message Fragment auto re-Request Time (in seconds)
+   //
+   public int MFRT = 60;
+   //
+   // BlockCHain key publication Timeout (in seconds)
+   public int BCHT = 86400;
+   // ENCryption key publication Timeout (in seconds)
+   public int ENCT = 86400;
+   //
+   public String mod_USERSIGN  = "irciot-usersign";
+   public String mod_USERCRYPT = "irciot-usercrypt";
+   //
+   public int crc16_start = 0xB001;
+   //
+   public int virtual_mid_pipeline_size = 16;
+   //
+   public int default_integrity_check = 0;
+   //
+   // 0 is No Integrity Check
+   // 1 is CRC16 Check "c1": +12 bytes
+   // 2 is CRC32 Check "c2": +14 bytes
    //
    public init_CONST() {
      if (JLayerIRCIoT.CAN_compress_datum) {
@@ -306,9 +367,51 @@ public class JLayerIRCIoT {
        };
      };
    };
+  };
 
-  }
+  // Global Variables
+  //
+  public static final init_CONST CONST = new init_CONST();
+  //
+  public String current_mid = "0"; // Message ID
+  public int    current_oid =  0 ; // Object ID
+  public int    current_did =  0 ; // Datum ID
+  //
+  public int mid_lock = 0;
+  public int oid_lock = 0;
+  public int did_lock = 0;
+  //
+  public boolean defrag_lock = false;
+  //
+  public boolean output_lock = false;
+  //
+  public String  ldict_file  = null;
+  public boolean ldict_lock  = false;
+  //
+  public String mid_method = CONST.tag_mid_default;
+  public int    oid_method = 0;
+  public int    did_method = 0;
+  //
+  public String crypt_method = CONST.tag_ENC_default;
+  //
+  public int blockchain_key_published = 0;
+  //
+  public int encryption_key_published = 0;
+  //
+  public int integrity_check = CONST.default_integrity_check;
+  //
 
-  public static init_CONST CONST = new init_CONST();
+  public JLayerIRCIoT() { // Class constructor
+    //
+
+  };
+
+  public String irciot_protocol_version() {
+    return this.CONST.irciot_protocol_version;
+  };
+
+  public String irciot_library_version() {
+    return this.CONST.irciot_library_version;
+  };
 
 }
