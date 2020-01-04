@@ -411,11 +411,11 @@ public class JLayerIRC {
 
   };
 
-  public String irciot_protocol_version() {
+  public String irciot_protocol_version_() {
     return this.CONST.irciot_protocol_version;
   };
 
-  public String irciot_library_version() {
+  public String irciot_library_version_() {
     return this.CONST.irciot_library_version;
   };
 

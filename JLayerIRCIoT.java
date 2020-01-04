@@ -14,6 +14,12 @@
 package JavaIRCIoT;
 
 import java.util.HashMap;
+import java.util.Random;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+import org.javatuples.Pair;
+import org.javatuples.Triplet;
 
 public class JLayerIRCIoT {
 
@@ -115,6 +121,39 @@ public class JLayerIRCIoT {
    public String tag_ENC_B85Z_2FISH = "b85F";
    public String tag_ENC_B64Z_USER  = "b64U";
    public String tag_ENC_B85Z_USER  = "b85U";
+   //
+   //
+   public String[] tag_ALL_BASE32_ENC = new String[] {
+     tag_ENC_BASE32,
+     tag_ENC_B32_ZLIB,
+     tag_ENC_B32_BZIP2
+   };
+   //
+   public String[] tag_ALL_BASE64_ENC = new String[] {
+     tag_ENC_BASE64,
+     tag_ENC_B64_AES,
+     tag_ENC_B64Z_AES,
+     tag_ENC_B64_ZLIB,
+     tag_ENC_B64_BZIP2,
+     tag_ENC_B64_RSA,
+     tag_ENC_B64Z_RSA,
+     tag_ENC_B64_2FISH,
+     tag_ENC_B64Z_2FISH
+   };
+   //
+   public String[] tag_ALL_BASE85_ENC = new String[] {
+     tag_ENC_BASE85,
+     tag_ENC_B85_ZLIB,
+     tag_ENC_B85_BZIP2,
+     tag_ENC_B85_AES,
+     tag_ENC_B85Z_AES,
+     tag_ENC_B85_2FISH,
+     tag_ENC_B85Z_2FISH
+   };
+   //
+   public String[] tag_ALL_BASE122_ENC = new String[] {
+     this.tag_ENC_BASE122
+   };
    //
    // Blockchain signing methods:
    //
@@ -406,12 +445,53 @@ public class JLayerIRCIoT {
 
   };
 
-  public String irciot_protocol_version() {
+  public String irciot_protocol_version_() {
     return this.CONST.irciot_protocol_version;
   };
 
-  public String irciot_library_version() {
+  public String irciot_library_version_() {
     return this.CONST.irciot_library_version;
   };
+
+  public Pair<String, String> irciot_compatibility_() {
+    return Pair.with(this.CONST.irciot_protocol_version, this.CONST.irciot_library_version);
+  };
+
+  public int irciot_crypto_get_base_(String in_crypt_method) {
+    int my_base = 0;
+    if (Arrays.asList(this.CONST.tag_ALL_BASE32_ENC).contains(in_crypt_method))
+      my_base = this.CONST.base_BASE32; else
+    if (Arrays.asList(this.CONST.tag_ALL_BASE64_ENC).contains(in_crypt_method))
+      my_base = this.CONST.base_BASE64; else
+    if (Arrays.asList(this.CONST.tag_ALL_BASE85_ENC).contains(in_crypt_method))
+      my_base = this.CONST.base_BASE85; else
+    if (Arrays.asList(this.CONST.tag_ALL_BASE122_ENC).contains(in_crypt_method))
+      my_base = this.CONST.base_BASE122;
+    return my_base;
+  };
+
+  //
+
+  //
+
+  // incomplete
+  public List<Pair<String, String>> irciot_encap_all_() {
+    //
+
+    List<Pair<String, String>> my_out = new ArrayList<>();
+
+    my_out.add(Pair.with("", ""));
+    return my_out;
+  };
+
+  // incomplete
+  public Triplet<String, Integer, Integer> irciot_encap_(String[] in_datumset, int in_skip, int in_part) {
+    String my_irciot = "";
+    int my_datums_skip = 0;
+    int my_datums_part = 0;
+
+    return Triplet.with(my_irciot, in_skip + my_datums_skip, my_datums_part);
+  };
+  // End of irciot_encap_()
 
 }
