@@ -43,7 +43,7 @@ public class JLayerIRCIoT {
 
   public static final class init_CONST {
    //
-   public String irciot_library_version = "0.0.161";
+   public String irciot_library_version = "0.0.163";
    //
    public String irciot_protocol_version = "0.3.29";
    //
@@ -152,7 +152,71 @@ public class JLayerIRCIoT {
    };
    //
    public String[] tag_ALL_BASE122_ENC = new String[] {
-     this.tag_ENC_BASE122
+     tag_ENC_BASE122
+   };
+   //
+   public String[] tag_ALL_nocompres_ENC = new String[] {
+     tag_ENC_BASE32,
+     tag_ENC_BASE64,
+     tag_ENC_BASE85,
+     tag_ENC_BASE122,
+     tag_ENC_B64_RSA,
+     tag_ENC_B85_RSA,
+     tag_ENC_B64_AES,
+     tag_ENC_B85_AES,
+     tag_ENC_B64_2FISH,
+     tag_ENC_B85_2FISH
+   };
+   //
+   public String[] tag_ALL_ZLIB_ENC = new String[] {
+     tag_ENC_B64_ZLIB,
+     tag_ENC_B85_ZLIB,
+     tag_ENC_B64Z_RSA,
+     tag_ENC_B85Z_RSA,
+     tag_ENC_B64Z_AES,
+     tag_ENC_B85Z_AES,
+     tag_ENC_B64Z_2FISH,
+     tag_ENC_B85Z_2FISH
+   };
+   //
+   public String[] tag_ALL_BZIP2_ENC = new String[] {
+     tag_ENC_B32_BZIP2,
+     tag_ENC_B64_BZIP2,
+     tag_ENC_B85_BZIP2
+   };
+   //
+   public String[] tag_ALL_RSA_ENC = new String[] {
+     tag_ENC_B64_RSA,
+     tag_ENC_B85_RSA,
+     tag_ENC_B64Z_RSA,
+     tag_ENC_B85Z_RSA
+  };
+  //
+  public String[] tag_ALL_AES_ENC = new String[] {
+     tag_ENC_B64_AES,
+     tag_ENC_B85_AES,
+     tag_ENC_B64Z_AES,
+     tag_ENC_B85Z_AES
+  };
+  //
+  public String[] tag_ALL_2FISH_ENC = new String[] {
+     tag_ENC_B64_2FISH,
+     tag_ENC_B85_2FISH,
+     tag_ENC_B64Z_2FISH,
+     tag_ENC_B85Z_2FISH
+  };
+  //
+  public String[] tag_ALL_nocrypt_ENC = new String[] {
+     tag_ENC_BASE32,
+     tag_ENC_BASE64,
+     tag_ENC_BASE85,
+     tag_ENC_BASE122,
+     tag_ENC_B32_ZLIB,
+     tag_ENC_B64_ZLIB,
+     tag_ENC_B85_ZLIB,
+     tag_ENC_B32_BZIP2,
+     tag_ENC_B64_BZIP2,
+     tag_ENC_B85_BZIP2
    };
    //
    // Blockchain signing methods:
@@ -204,6 +268,12 @@ public class JLayerIRCIoT {
    public int compress_NONE  = 0;
    public int compress_ZLIB  = 3;
    public int compress_BZIP2 = 102;
+   //
+   public int[] crypto_ALL_asymmetric  = new int[] {
+    crypto_RSA };
+   public int[] crypto_ALL_symmetric   = new int[] {};
+   public int[] crypto_ALL_private_key = new int[] {
+    crypto_AES, crypto_2FISH };
    //
    // The Object Types, will be replaced
    // by IRC-IoT "Dictionaries" mechanism
@@ -432,6 +502,10 @@ public class JLayerIRCIoT {
   public int    did_method = 0;
   //
   public String crypt_method = CONST.tag_ENC_default;
+  public int crypt_model = this.irciot_crypto_get_model_(this.crypt_method);
+  public int crypt_algo = this.irciot_crypto_get_algorithm_(this.crypt_method);
+  public int crypt_base = this.irciot_crypto_get_base_(this.crypt_method);
+  public int crypt_compress = this.irciot_crypto_get_compress_(this.crypt_method);
   //
   public int blockchain_key_published = 0;
   //
@@ -439,7 +513,6 @@ public class JLayerIRCIoT {
   //
   public int integrity_check = CONST.default_integrity_check;
   //
-
   public JLayerIRCIoT() { // Class constructor
     //
 
@@ -448,32 +521,94 @@ public class JLayerIRCIoT {
   public String irciot_protocol_version_() {
     return this.CONST.irciot_protocol_version;
   };
-
+  //
   public String irciot_library_version_() {
     return this.CONST.irciot_library_version;
   };
-
+  //
   public Pair<String, String> irciot_compatibility_() {
     return Pair.with(this.CONST.irciot_protocol_version, this.CONST.irciot_library_version);
   };
+  //
+
+  //
+  public String irciot_crypto_wo_encryption_(String in_crypt_method) {
+    int my_base = this.irciot_crypto_get_base_(in_crypt_method);
+    int my_compress = this.irciot_crypto_get_compress_(in_crypt_method);
+    if (my_base == this.CONST.base_BASE32)
+      if (my_compress == this.CONST.compress_ZLIB)
+        return this.CONST.tag_ENC_B32_ZLIB;
+      else if (my_compress == this.CONST.compress_BZIP2)
+        return this.CONST.tag_ENC_B32_BZIP2;
+      else return this.CONST.tag_ENC_BASE32;
+    else if (my_base == this.CONST.base_BASE64)
+      if (my_compress == this.CONST.compress_ZLIB)
+        return this.CONST.tag_ENC_B64_ZLIB;
+      else if (my_compress == this.CONST.compress_BZIP2)
+        return this.CONST.tag_ENC_B64_BZIP2;
+      else if (my_base == this.CONST.base_BASE85)
+        if (my_compress == this.CONST.compress_ZLIB)
+          return this.CONST.tag_ENC_B85_ZLIB;
+        else if (my_compress == this.CONST.compress_BZIP2)
+          return this.CONST.tag_ENC_B85_BZIP2;
+        else return this.CONST.tag_ENC_BASE85;
+    return this.CONST.tag_ENC_BASE64;
+  };
+  // End of irciot_crypto_wo_encryption_()
+
+  public int irciot_crypto_get_model_(String in_crypt_method) {
+    if (Arrays.asList(this.CONST.tag_ALL_nocrypt_ENC).contains(in_crypt_method)) {
+      return this.CONST.crypt_NO_ENCRYPTION;
+    } else {
+      int my_algo = this.irciot_crypto_get_algorithm_(in_crypt_method);
+      if (Arrays.asList(this.CONST.crypto_ALL_asymmetric).contains(my_algo))
+        return this.CONST.crypt_ASYMMETRIC;
+      else if (Arrays.asList(this.CONST.crypto_ALL_symmetric).contains(my_algo))
+        return this.CONST.crypt_SYMMETRIC;
+      else if (Arrays.asList(this.CONST.crypto_ALL_private_key).contains(my_algo))
+        return this.CONST.crypt_PRIVATE_KEY;
+    };
+    return this.crypt_model;
+  };
+  // End of irciot_crypto_get_model_()
 
   public int irciot_crypto_get_base_(String in_crypt_method) {
-    int my_base = 0;
     if (Arrays.asList(this.CONST.tag_ALL_BASE32_ENC).contains(in_crypt_method))
-      my_base = this.CONST.base_BASE32; else
+      return this.CONST.base_BASE32; else
     if (Arrays.asList(this.CONST.tag_ALL_BASE64_ENC).contains(in_crypt_method))
-      my_base = this.CONST.base_BASE64; else
+      return this.CONST.base_BASE64; else
     if (Arrays.asList(this.CONST.tag_ALL_BASE85_ENC).contains(in_crypt_method))
-      my_base = this.CONST.base_BASE85; else
+      return this.CONST.base_BASE85; else
     if (Arrays.asList(this.CONST.tag_ALL_BASE122_ENC).contains(in_crypt_method))
-      my_base = this.CONST.base_BASE122;
-    return my_base;
+      return this.CONST.base_BASE122;
+    return this.crypt_base;
   };
+  // End of irciot_crypto_get_base_()
+
+  public int irciot_crypto_get_compress_(String in_crypt_method) {
+    if (Arrays.asList(this.CONST.tag_ALL_nocompres_ENC).contains(in_crypt_method))
+      return this.CONST.compress_NONE; else
+    if (Arrays.asList(this.CONST.tag_ALL_ZLIB_ENC).contains(in_crypt_method))
+      return this.CONST.compress_ZLIB; else
+    if (Arrays.asList(this.CONST.tag_ALL_BZIP2_ENC).contains(in_crypt_method))
+      return this.CONST.compress_BZIP2;
+    return this.crypt_compress;
+  };
+  // End of irciot_crypto_get_compress_()
+
+  public int irciot_crypto_get_algorithm_(String in_crypt_method) {
+    if (Arrays.asList(this.CONST.tag_ALL_RSA_ENC).contains(in_crypt_method))
+      return this.CONST.crypto_RSA;
+    else if (Arrays.asList(this.CONST.tag_ALL_AES_ENC).contains(in_crypt_method))
+      return this.CONST.crypto_AES;
+    else if (Arrays.asList(this.CONST.tag_ALL_2FISH_ENC).contains(in_crypt_method))
+      return this.CONST.crypto_2FISH;
+    return this.crypt_algo;
+
+  };
+  // End of irciot_crypto_get_algorithm_()
 
   //
-
-  //
-
   // incomplete
   public List<Pair<String, String>> irciot_encap_all_() {
     //
