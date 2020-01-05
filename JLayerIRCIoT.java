@@ -15,11 +15,16 @@ package JavaIRCIoT;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Iterator;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class JLayerIRCIoT {
 
@@ -43,7 +48,7 @@ public class JLayerIRCIoT {
 
   public static final class init_CONST {
    //
-   public String irciot_library_version = "0.0.163";
+   public String irciot_library_version = "0.0.165";
    //
    public String irciot_protocol_version = "0.3.29";
    //
@@ -511,6 +516,8 @@ public class JLayerIRCIoT {
   //
   public int encryption_key_published = 0;
   //
+  public int message_mtu = CONST.default_mtu;
+  //
   public int integrity_check = CONST.default_integrity_check;
   //
   public JLayerIRCIoT() { // Class constructor
@@ -608,7 +615,28 @@ public class JLayerIRCIoT {
   };
   // End of irciot_crypto_get_algorithm_()
 
-  //
+  // incomplete
+  public Pair<String, Integer> irciot_encap_bigdatum_(JSONArray in_datums, int in_part) {
+
+    return Pair.with("", 0);
+  };
+
+  // incomplete
+  public String irciot_encap_internal_(String in_datumset) {
+    try {
+      JSONParser my_parser = new JSONParser();
+      JSONObject my_datums = (JSONObject) my_parser.parse(in_datumset);
+    } catch (ParseException e) {
+      // e.printStackTrace();
+      return "";
+    };
+    String my_irciot = "";
+
+
+    return my_irciot;
+  };
+  // End of irciot_encap_internal_()
+
   // incomplete
   public List<Pair<String, String>> irciot_encap_all_() {
     //
@@ -620,11 +648,101 @@ public class JLayerIRCIoT {
   };
 
   // incomplete
-  public Triplet<String, Integer, Integer> irciot_encap_(String[] in_datumset, int in_skip, int in_part) {
+  public Triplet<String, Integer, Integer> irciot_encap_(String in_datumset, int in_skip, int in_part) {
     String my_irciot = "";
+    String my_datumset = in_datumset;
+    boolean my_encrypt = false;
     int my_datums_skip = 0;
     int my_datums_part = 0;
+    int my_datums_cnt  = 0;
+    String save_mid = this.current_mid;
+    Object my_json_obj = (Object) null;
+    JSONArray my_datums = (JSONArray) null;
+    JSONParser my_parser = new JSONParser();
+    try {
+      my_json_obj = (Object) my_parser.parse(my_datumset);
+    } catch (ParseException e) {
+      // e.printStackTrace();
+      return Triplet.with("", 0, 0);
+    };
+    int my_total = 0;
+    if (my_json_obj instanceof JSONArray) {
+      my_datums = (JSONArray) my_json_obj;
+      my_total = my_datums.size();
+    } else return Triplet.with("", 0, 0);
+    if (in_skip > 0) {
+      my_datums_cnt = 0;
 
+    };
+    my_irciot = this.irciot_encap_internal_(my_datumset);
+    if ((my_irciot.length() > this.message_mtu) || my_encrypt) {
+      if (in_skip == 0)
+        this.current_mid = save_mid; // mid rollback
+      try {
+        my_json_obj = (Object) my_parser.parse(my_datumset);
+      } catch (ParseException e) {
+        // e.printStackTrace();
+        return Triplet.with("", 0, 0);
+      };
+      int one_datum = 0;
+      if (my_json_obj instanceof JSONArray) {
+        my_datums = (JSONArray) my_json_obj;
+        int my_datums_total = my_datums.size();
+        if (my_datums_total > 1) {
+          my_datums_skip = my_datums_total;
+          while ((my_irciot.length() > this.message_mtu) &&
+            (my_datums_skip <= my_datums_total)) {
+            JSONArray part_datums = (JSONArray) null;
+            my_datums_cnt = 0;
+            // String my_datum = "";
+            // Iterator<String> my_iterator = my_datums.iterator();
+            // while (my_iterator.hasNext()) {
+            //   if (my_datums_cnt < my_datums_skip)
+            //     my_datum = my_iterator.next();
+            //     part_datums.add(my_datum);
+            // };
+            if (part_datums.size() == 0) break;
+            String str_part_datums = part_datums.toJSONString();
+            this.current_mid = save_mid; // mid rollback
+            my_irciot = this.irciot_encap_internal_(str_part_datums);
+            if (my_irciot.length() <= this.message_mtu) {
+              int my_skip_out = in_skip + my_datums_skip;
+              if (my_skip_out >= my_total)
+                my_skip_out = 0;
+              return Triplet.with(my_irciot, my_skip_out, 0);
+            };
+            my_datums_skip -= 1;
+          }; // while
+          one_datum = 1; // Multidatum, but current "Datum" is too large
+        } else
+          one_datum = 1; // One "Datum" in list, and it is too large
+      };
+      if (my_json_obj instanceof JSONObject)
+        one_datum = 1; // One large "Datum" without list
+      if (my_encrypt)
+        one_datum = 1;
+      if (one_datum == 1) {
+        this.current_mid = save_mid; // Message ID rollback
+        Pair<String, Integer> my_pair
+          = this.irciot_encap_bigdatum_(my_datums, in_part);
+        my_irciot = my_pair.getValue0();
+        my_datums_part = my_pair.getValue1();
+        if (my_datums_part == 0)
+          my_datums_skip += 1;
+      };
+    } else {
+      my_datums_skip = my_total - in_skip;
+
+    };
+    if (my_datums_part == 0)
+      this.current_oid += 1;
+    if (in_skip + my_datums_skip >= my_total) {
+      in_skip = 0;
+      my_datums_skip = 0;
+      if (this.CAN_encrypt_datum && my_datums_part == 0) {
+        // this.crypt_cache = null;
+      };
+    };
     return Triplet.with(my_irciot, in_skip + my_datums_skip, my_datums_part);
   };
   // End of irciot_encap_()

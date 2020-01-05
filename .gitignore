@@ -10,6 +10,7 @@
 *.tar.gz
 *.rar
 *~
+JSON.txt
 build.sh
 examples/
 examples/*.java
