@@ -120,6 +120,8 @@ public class JLayerIRC {
    public String irc_special_chars = "-[]\\`^{}";
    public String irc_nick_first_char = irc_ascii_letters + irc_special_chars;
    public String irc_nick_chars = irc_ascii_letters + irc_ascii_digits + irc_special_chars;
+   public String irc_translation_in = irc_ascii_uppercase + "[]\\^";
+   public String irc_translation_out = irc_ascii_lowercase + "{}|~";
    public String irc_mode_add = "+";
    public String irc_mode_del = "-";
    public String irc_change_modes = irc_mode_add + irc_mode_del;
@@ -419,4 +421,32 @@ public class JLayerIRC {
     return this.CONST.irciot_library_version;
   };
 
+  // incomplete
+  public String irc_tolower_(String in_input) {
+    return in_input;
+  };
+
+  public String[] irc_get_list_(Object in_input) {
+    String[] my_output = new String[] {};
+    if (in_input instanceof String) {
+      my_output[0] = (String) in_input;
+    } else if (in_input instanceof String[])
+      return (String[]) in_input;
+    return my_output;
+  };
+
+  // incomplete
+  public boolean is_irc_nick_(String in_nick) {
+
+    return true;
+  };
+
+  // incomplete
+  public boolean is_irc_channel_(String in_channel) {
+
+    return true;
+  };
+
 }
+
+

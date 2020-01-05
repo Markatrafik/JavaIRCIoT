@@ -611,7 +611,6 @@ public class JLayerIRCIoT {
     else if (Arrays.asList(this.CONST.tag_ALL_2FISH_ENC).contains(in_crypt_method))
       return this.CONST.crypto_2FISH;
     return this.crypt_algo;
-
   };
   // End of irciot_crypto_get_algorithm_()
 
@@ -647,7 +646,6 @@ public class JLayerIRCIoT {
     return my_out;
   };
 
-  // incomplete
   public Triplet<String, Integer, Integer> irciot_encap_(String in_datumset, int in_skip, int in_part) {
     String my_irciot = "";
     String my_datumset = in_datumset;
@@ -660,7 +658,7 @@ public class JLayerIRCIoT {
     JSONArray my_datums = (JSONArray) null;
     JSONParser my_parser = new JSONParser();
     try {
-      my_json_obj = (Object) my_parser.parse(my_datumset);
+      my_json_obj = my_parser.parse(my_datumset);
     } catch (ParseException e) {
       // e.printStackTrace();
       return Triplet.with("", 0, 0);
@@ -672,14 +670,35 @@ public class JLayerIRCIoT {
     } else return Triplet.with("", 0, 0);
     if (in_skip > 0) {
       my_datums_cnt = 0;
-
-    };
+      JSONArray my_datums_array = (JSONArray) null;
+      Iterator<?> my_iterator = my_datums.iterator();
+      while (my_iterator.hasNext()) {
+        my_datums_cnt += 1;
+        String my_datum_str = (String) null;
+        Object my_datum_obj = (Object) my_iterator.next();
+        JSONObject my_datum_json = (JSONObject) null;
+        if (my_datum_obj instanceof String)
+          my_datum_str = (String) my_datum_obj;
+        if (my_datum_obj instanceof JSONObject) {
+          my_datum_json = (JSONObject) my_datum_obj;
+          my_datum_str = my_datum_json.toString();
+        };
+        if ((my_datums_cnt > in_skip) && (my_datum_str != null))
+          my_datums_array.add(my_datum_str);
+      }; // while my_iterator
+      my_datumset = my_datums_array.toString();
+      try {
+        my_datums = (JSONArray) my_parser.parse(my_datumset);
+      } catch (ParseException e) {
+        return Triplet.with("", 0, 0);
+      };
+    }; // in_skip
     my_irciot = this.irciot_encap_internal_(my_datumset);
     if ((my_irciot.length() > this.message_mtu) || my_encrypt) {
       if (in_skip == 0)
         this.current_mid = save_mid; // mid rollback
       try {
-        my_json_obj = (Object) my_parser.parse(my_datumset);
+        my_json_obj = my_parser.parse(my_datumset);
       } catch (ParseException e) {
         // e.printStackTrace();
         return Triplet.with("", 0, 0);
@@ -693,14 +712,21 @@ public class JLayerIRCIoT {
           while ((my_irciot.length() > this.message_mtu) &&
             (my_datums_skip <= my_datums_total)) {
             JSONArray part_datums = (JSONArray) null;
+            Iterator<?> my_iterator = my_datums.iterator();
             my_datums_cnt = 0;
-            // String my_datum = "";
-            // Iterator<String> my_iterator = my_datums.iterator();
-            // while (my_iterator.hasNext()) {
-            //   if (my_datums_cnt < my_datums_skip)
-            //     my_datum = my_iterator.next();
-            //     part_datums.add(my_datum);
-            // };
+            while (my_iterator.hasNext()) {
+              Object my_datum_obj = (Object) my_iterator.next();
+              JSONObject my_datum_json = (JSONObject) null;
+              String my_datum_str = (String) null;
+              if (my_datum_obj instanceof String)
+                my_datum_str = (String) my_datum_obj;
+              if (my_datum_obj instanceof JSONObject) {
+                my_datum_json = (JSONObject) my_datum_obj;
+                my_datum_str = my_datum_json.toString();
+              };
+              if ((my_datums_cnt < my_datums_skip) && (my_datum_str != null))
+                part_datums.add(my_datum_str);
+            }; // while my_iterator
             if (part_datums.size() == 0) break;
             String str_part_datums = part_datums.toJSONString();
             this.current_mid = save_mid; // mid rollback
@@ -712,11 +738,11 @@ public class JLayerIRCIoT {
               return Triplet.with(my_irciot, my_skip_out, 0);
             };
             my_datums_skip -= 1;
-          }; // while
+          }; // while my_irciot & my_datums_skip
           one_datum = 1; // Multidatum, but current "Datum" is too large
         } else
           one_datum = 1; // One "Datum" in list, and it is too large
-      };
+      }; // if my_json_obj is JSONArray
       if (my_json_obj instanceof JSONObject)
         one_datum = 1; // One large "Datum" without list
       if (my_encrypt)
@@ -732,7 +758,7 @@ public class JLayerIRCIoT {
       };
     } else {
       my_datums_skip = my_total - in_skip;
-
+      this.current_did += 1; // Default Datum ID changing method
     };
     if (my_datums_part == 0)
       this.current_oid += 1;
