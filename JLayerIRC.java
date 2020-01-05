@@ -25,6 +25,8 @@ public class JLayerIRC {
    //
    public String irciot_protocol_version = "0.3.29";
    //
+   private static final long serialVersionUID = 32765;
+   //
    public boolean irc_default_debug = DO_debug_library;
    //
    public String irc_default_nick = "MyBot";
@@ -35,6 +37,7 @@ public class JLayerIRC {
    public int    irc_default_port  = 6667;
    public String irc_default_password = null;
    public boolean irc_default_ssl  = false;
+   public boolean irc_default_ident = false;
    //
    public String irc_default_proxy = null;
    public String irc_default_proxy_server = null;
@@ -408,17 +411,20 @@ public class JLayerIRC {
 
   public final static init_CONST CONST = new init_CONST();
 
+  public boolean irc_ssl = CONST.irc_default_ssl;
+  public boolean irc_ident = CONST.irc_default_ident;
+  //
   public JLayerIRC() { // Class constructor
     //
 
   };
 
   public String irciot_protocol_version_() {
-    return this.CONST.irciot_protocol_version;
+    return CONST.irciot_protocol_version;
   };
 
   public String irciot_library_version_() {
-    return this.CONST.irciot_library_version;
+    return CONST.irciot_library_version;
   };
 
   // incomplete
