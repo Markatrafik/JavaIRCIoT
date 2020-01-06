@@ -2,7 +2,7 @@
  * Copyright (c) 2020 Alexey Y. Woronov
  */
  
-import JavaIRCIoT.JLayerIRC;
+import javairciot.*;
 
 class JLayerIRC_test extends JavaIRCIoT.JLayerIRC {
 
@@ -14,8 +14,8 @@ class JLayerIRC_test extends JavaIRCIoT.JLayerIRC {
     System.out.print(CONST.irciot_library_version);
     System.out.print(", IRC-IoT protocol version: ");
     System.out.println(CONST.irciot_protocol_version);
-    // System.out.println(CONST.default_mtu);
-    // System.out.println(CONST.code_MAPEND);
+    System.out.println(CONST.default_mtu);
+    System.out.println(CONST.code_MAPEND);
 
   }
 

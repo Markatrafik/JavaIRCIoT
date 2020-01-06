@@ -50,7 +50,7 @@ public class jlayerirciot {
   public static final boolean DO_auto_blockchain = false;
   public static final boolean DO_auto_compress   = false;
 
-  public static final class init_CONST {
+  public static final class init_constants {
    //
    private static final long serialVersionUID = 32767;
    //
@@ -473,7 +473,7 @@ public class jlayerirciot {
    // 1 is CRC16 Check "c1": +12 bytes
    // 2 is CRC32 Check "c2": +14 bytes
    //
-   public init_CONST() {
+   public init_constants() {
      if (jlayerirciot.CAN_compress_datum) {
        if (jlayerirciot.CAN_encrypt_datum) {
          this.tag_ENC_default = tag_ENC_B64Z_RSA;
@@ -494,7 +494,7 @@ public class jlayerirciot {
   //
   private static final long serialVersionUID = 65535;
   //
-  public static final init_CONST CONST = new init_CONST();
+  public static final init_constants CONST = new init_constants();
   //
   public String current_mid = "0"; // Message ID
   public int    current_oid =  0 ; // Object ID

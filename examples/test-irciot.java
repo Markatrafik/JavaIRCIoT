@@ -2,9 +2,9 @@
  * Copyright (c) 2020 Alexey Y. Woronov
  */
 
-import JavaIRCIoT.JLayerIRCIoT;
+import javairciot.*;
 
-class JLayerIRCIoT_test extends JavaIRCIoT.JLayerIRCIoT {
+class javairciot_test extends javairciot.jlayerirciot {
 
   public static void main(String args[]) {
 

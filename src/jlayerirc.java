@@ -19,7 +19,7 @@ public class jlayerirc {
   //
   public static final boolean DO_debug_library  = false;
 
-  public static final class init_CONST {
+  public static final class init_constants {
    //
    public String irciot_library_version = "0.0.167";
    //
@@ -398,7 +398,7 @@ public class jlayerirc {
    //
    public int ident_default_port = 113;
    //
-   public init_CONST() {
+   public init_constants() {
      if (this.irc_draft == "Undernet") {
        this.default_mtu = 450;
        this.code_STATSTLINE = "246";
@@ -411,7 +411,7 @@ public class jlayerirc {
    };
   };
 
-  public final static init_CONST CONST = new init_CONST();
+  public final static init_constants CONST = new init_constants();
 
   public boolean irc_ssl = CONST.irc_default_ssl;
   public boolean irc_ident = CONST.irc_default_ident;
