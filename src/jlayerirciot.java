@@ -11,7 +11,7 @@
  *   Alexey Y. Woronov <alexey@woronov.ru>
  */
  
-package JavaIRCIoT;
+package javairciot;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -19,6 +19,8 @@ import java.util.Iterator;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.javatuples.Ennead;
@@ -28,7 +30,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 @SuppressWarnings("unchecked")
 
-public class JLayerIRCIoT {
+public class jlayerirciot {
 
   // Those Global options override default behavior and memory usage:
   //
@@ -241,7 +243,7 @@ public class JLayerIRCIoT {
    //
    public String tag_ENC_default = tag_ENC_BASE64;
    //
-   public String tag_mid_default = JLayerIRCIoT.CAN_mid_blockchain ? tag_mid_ED25519 : "";
+   public String tag_mid_default = jlayerirciot.CAN_mid_blockchain ? tag_mid_ED25519 : "";
    // Simple IRC-IoT blockchain signing by ED25519
    //
    public int crypt_NO_ENCRYPTION = 0;
@@ -461,7 +463,7 @@ public class JLayerIRCIoT {
    public String mod_USERSIGN  = "irciot-usersign";
    public String mod_USERCRYPT = "irciot-usercrypt";
    //
-   public int crc16_start = 0xB001;
+   public int crc16_start = 0xA001; // CRC-16-IBM
    //
    public int virtual_mid_pipeline_size = 16;
    //
@@ -472,14 +474,14 @@ public class JLayerIRCIoT {
    // 2 is CRC32 Check "c2": +14 bytes
    //
    public init_CONST() {
-     if (JLayerIRCIoT.CAN_compress_datum) {
-       if (JLayerIRCIoT.CAN_encrypt_datum) {
+     if (jlayerirciot.CAN_compress_datum) {
+       if (jlayerirciot.CAN_encrypt_datum) {
          this.tag_ENC_default = tag_ENC_B64Z_RSA;
        } else {
          this.tag_ENC_default = tag_ENC_B64_ZLIB;
        };
      } else {
-       if (JLayerIRCIoT.CAN_encrypt_datum) {
+       if (jlayerirciot.CAN_encrypt_datum) {
          this.tag_ENC_default = tag_ENC_B64_RSA;
        } else {
          this.tag_ENC_default = tag_ENC_BASE64;
@@ -527,7 +529,7 @@ public class JLayerIRCIoT {
   //
   public int integrity_check = CONST.default_integrity_check;
   //
-  public JLayerIRCIoT() { // Class constructor
+  public jlayerirciot() { // Class constructor
     //
 
   };
@@ -544,6 +546,41 @@ public class JLayerIRCIoT {
     return Pair.with(CONST.irciot_protocol_version, CONST.irciot_library_version);
   };
   //
+
+  // incomplete
+  public void irciot_crc16_init_() {
+
+  };
+
+  // incomplete
+  public void irciot_crc32_init_() {
+
+  };
+
+  // incomplete
+  public String irciot_crc16_(byte[] in_bytes) {
+    // if this.crc16_table_
+    //   this.irciot_crc16_init_()
+    int my_crc = 0xFFFF;
+    int my_poly = CONST.crc16_start;
+    for (byte _b : in_bytes) {
+      int _tmp = (my_crc ^ _b) & 0xFF;
+      for (int _i = 0;_i < 8;_i++) {
+        if ((_tmp & 1) != 0)
+         _tmp = (_tmp >> 1) ^ my_poly;
+        else _tmp = (_tmp >> 1);
+      }
+    };
+    return Integer.toHexString(my_crc);
+  }
+  //
+  public String irciot_crc32_(byte[] in_bytes) {
+    // if this.crc32_table_
+    //   this.irciot_crc16_init_()
+    Checksum my_crc = new CRC32();
+    my_crc.update(in_bytes, 0, in_bytes.length);
+    return String.format("%08X", my_crc.getValue());
+  };
 
   // incomplete
   public String irciot_defragmentation_(String in_enc,

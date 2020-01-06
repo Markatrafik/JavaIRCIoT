@@ -11,9 +11,9 @@
  *   Alexey Y. Woronov <alexey@woronov.ru>
  */
  
-package JavaIRCIoT;
+package javairciot;
 
-public class JLayerIRC {
+public class jlayerirc {
 
   // Those Global options override default behavior and memory usage:
   //
@@ -416,7 +416,7 @@ public class JLayerIRC {
   public boolean irc_ssl = CONST.irc_default_ssl;
   public boolean irc_ident = CONST.irc_default_ident;
   //
-  public JLayerIRC() { // Class constructor
+  public jlayerirc() { // Class constructor
     //
 
   };
@@ -432,6 +432,27 @@ public class JLayerIRC {
   // incomplete
   public String irc_tolower_(String in_input) {
     return in_input;
+  };
+
+  // incomplete
+  public void irc_track_clear_anons_() {
+
+  };
+
+  // incomplete
+  public void irc_track_clear_nicks_() {
+
+  };
+
+  // incomplete
+  public void irc_track_delete_nick_(String in_nick) {
+
+  };
+
+  // incomplete
+  public String irc_track_get_nick_by_vuid_(String in_vuid) {
+
+    return (String) null;
   };
 
   public String[] irc_get_list_(Object in_input) {
