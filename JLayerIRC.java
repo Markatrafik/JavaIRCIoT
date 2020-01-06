@@ -21,7 +21,7 @@ public class JLayerIRC {
 
   public static final class init_CONST {
    //
-   public String irciot_library_version = "0.0.165";
+   public String irciot_library_version = "0.0.167";
    //
    public String irciot_protocol_version = "0.3.29";
    //
@@ -395,6 +395,8 @@ public class JLayerIRC {
    public String code_RPL_DUMPRPL        = irc_draft == "Unreal"   ? "641" : null;
    public String code_RPL_EODUMP         = irc_draft == "Unreal"   ? "642" : null;
    public String code_NUMERICERROR       = irc_draft == "Bahamut"  ? "999" : null;
+   //
+   public int ident_default_port = 113;
    //
    public init_CONST() {
      if (this.irc_draft == "Undernet") {
