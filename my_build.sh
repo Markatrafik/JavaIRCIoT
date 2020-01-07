@@ -11,9 +11,12 @@ export RFC1459_BCODE="${RFC1459_CLASS}.class"
 export RFC1459_BCODE_ADDON="${RFC1459_CLASS}\$init_constants.class"
 export CLASSPATH="/usr/share/java/json-simple-1.1.1.jar"
 export CLASSPATH="${CLASSPATH}:/usr/share/java/javatuples.jar"
-export DEBIAN_PACKAGES="libjavatuples-java libjson-simple-java"
+export PASE_DEFAULT_UTF8=Y
+export DEBIAN_PACKAGES="libjavatuples-java libjson-simple-java maven"
 export COMPILE_ARGS="-Xdiags:verbose"
 export COMPILE_ARGS="-Xlint" # Warnings
+export MAVEN_ARGS="-DsourceEncoding=UTF-8 -Dfile.encoding=UTF-8"
+export MAVEN_ARGS="${MAVEN_ARGS} -DdefaultCharacterEncoding=UTF-8"
 export BINARY_APT_GET="/usr/bin/apt-get"
 export BINARY_JAVAC="/usr/bin/javac"
 export BINARY_DPKG="/usr/bin/dpkg"
@@ -24,17 +27,33 @@ export BINARY_CP="/bin/cp"
 export BINARY_RM="/bin/rm"
 export BINARY_RMDIR="/bin/rmdir"
 export BINARY_MKDIR="/bin/mkdir"
+export BINARY_MVN="/usr/bin/mvn"
 
 if [ "x${1}x" == "xx" ]; then
  echo -ne "Usage: ${0} [ build | test | clear ]\n\n"
- echo -ne " build -- build Java IRC-IoT class\n"
- echo -ne " test  -- build Java IRC-IoT class and all test examples\n"
+ echo -ne " build -- build Java IRC-IoT library with simple Java compiling\n"
+ echo -ne " maven -- build Java IRC-IoT library using Maven system\n"
+ echo -ne " test  -- build Java IRC-IoT library and all test examples\n"
  echo -ne " clear -- clear all distribution from *.class and other\n\n"
  exit 0
 elif [ "x${1}x" != "xbuildx" \
+    -a "x${1}x" != "xmavenx" \
     -a "x${1}x" != "xclearx" \
     -a "x${1}x" != "xtestx" ]; then
  echo -ne "Error: incorrect parameter\n" ; exit 1
+fi
+
+if [ "x${1}x" == "xmavenx" ]; then
+ if [ -d "./target" ]; then
+  "${BINARY_RM}" -rf "./target" 2>/dev/null ; fi
+ if [ -f /etc/debian_version ]; then
+  "${BINARY_APT_GET}" -yqf install maven 1>/dev/null 2>/dev/null ; fi
+ if [ ! -x "${BINARY_MVN}" ]; then
+  echo "No executable file: '${BINARY_MVN}', exiting... " ; exit 1 ; fi
+ "${BINARY_MVN}" ${MAVEN_ARGS} ; ERRLV8=$?
+ if [ ${ERRLV8} -eq 0 ]; then
+ echo -ne "\033[1;32mAll OK\033[0m (maven)\n" ; exit 0 ; fi
+ exit 1
 fi
 
 for THE_BINARY in "${BINARY_APT_GET}" "${BINARY_JAVAC}" \
@@ -54,6 +73,8 @@ for BYTECODE_FILE in "${IRCIOT_CLASS}" "${RFC1459_CLASS}" ; do
 done
 
 if [ "x${1}" == "xclear" ]; then
+ if [ -d "./target" ]; then
+  "${BINARY_RM}" -rf "./target" 2>/dev/null ; fi
  "${BINARY_RM}" -f "./src/"*~ 2>/dev/null
  "${BINARY_RM}" -f "./javairciot" 2>/dev/null
  "${BINARY_RM}" -f "./build/"*.jar 2>/dev/null
@@ -94,7 +115,6 @@ fi
 export ERRLV3=0
 if [ "x${1}" == "xtest" ]; then
  export CLASSPATH="./build/${PACKAGE_NAME}.jar:${CLASSPATH}"
- "${BINARY_MKDIR}" "./build/examples" 2>/dev/null
  echo "Trying to compile examples ..."
  for TEST_FILE in ./examples/*.java ; do
   if [ "x${TEST_FILE}" == "x./examples/*.java" ]; then

@@ -699,14 +699,14 @@ public class jlayerirciot {
   // End of irciot_encap_internal_()
 
   // incomplete
-  public List<Pair<String, String>> irciot_encap_all_() {
+  // public List<Pair<String, String>> irciot_encap_all_() {
     //
 
-    List<Pair<String, String>> my_out = new ArrayList<>();
+    // List<Pair<String, String>> my_out = new ArrayList<>();
 
-    my_out.add(Pair.with("", ""));
-    return my_out;
-  };
+    // my_out.add(Pair.with("", ""));
+    // return my_out;
+  // };
 
   public Triplet<String, Integer, Integer> irciot_encap_(String in_datumset, int in_skip, int in_part) {
     String my_irciot = "";
