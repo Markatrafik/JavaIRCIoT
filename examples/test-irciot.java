@@ -4,7 +4,7 @@
 
 import javairciot.*;
 
-class javairciot_test extends javairciot.jlayerirciot {
+class test_javairciot extends javairciot.jlayerirciot {
 
   public static void main(String args[]) {
 

@@ -1,0 +1,53 @@
+#!/bin/bash
+
+export BINARY_TR="/usr/bin/tr"
+export BINARY_JAVA="/usr/bin/java"
+export BINARY_LN="/bin/ln"
+export BINARY_GREP="/bin/grep"
+export BINARY_AWK="/usr/bin/awk"
+export BINARY_BASENAME="/usr/bin/basename"
+export SCRIPT_BUILD="./my_build.sh"
+
+for THE_BINARY in "${BINARY_JAVA}" "${BINARY_BASENAME}" "${BINARY_LN}" \
+ "${BINARY_GREP}" "${BINARY_TR}" "${BINARY_AWK}" "${SCRIPT_BUILD}" ; do
+ if [ ! -x "${THE_BINARY}" ]; then
+  echo "No executable file: '${THE_BINARY}', exiting... " ; exit 1 ; fi
+done
+
+export TESTS=""
+for TEST_FILE in ./examples/*.java ; do
+ if [ "x${TEST_FILE}" == "x./examples/*.java" ]; then
+  echo "Error: no files in examples directory" ; exit 1 ; fi
+  export TESTS="${TESTS} $("${BINARY_BASENAME}" "${TEST_FILE}" '.java')"
+done
+
+export TEST="$(echo "${1}" | "${BINARY_TR}" -d ' ' 2>/dev/null)"
+if [ "x${TEST}x" == "xx" ]; then
+ echo -ne "Usage: ${0} [<test-name>]\n"
+ echo -ne "Where <test-name> is one of tests:\n\n"
+ echo -ne "${TESTS}\n\n" ; exit 0
+elif [ ! -f "./examples/${TEST}.java" ]; then
+ echo "No such test example: '${TEST}' ..." ; exit 1
+else
+ export TEST_CLASS="$("${BINARY_GREP}" "^class " \
+ "./examples/${TEST}.java" | \
+ "${BINARY_AWK}" '{printf "%s", $2}' 2>/dev/null)" ; fi
+if [ ! -f "./${TEST_CLASS}.class" \
+    -a -f "./examples/${TEST}.java" ]; then
+ echo "File './examples/${TEST}.java' exists, but not comiled yet."
+ echo "Trying to build all test examples by: '${SCRIPT_BUILD} test'"
+ "${SCRIPT_BUILD}" test
+fi
+if [ -f "./${TEST_CLASS}.class" ]; then
+ if [ ! -h "./javairciot" ]; then
+  "${BINARY_LN}" -s "build/javairciot" . 2>/dev/null ; fi
+ echo -ne "Trying to Run: '\033[1m./${TEST_CLASS}.class\033[0m' ...\n\n"
+ "${BINARY_JAVA}" "${TEST_CLASS}" ; ERRLV=$?
+ if [ ${ERRLV} -eq 0 ]; then echo -ne "\n\033[1;32mAll OK\033[0m (test)\n"
+ exit 0 ; fi
+ exit 1
+else
+ echo "Error: Cannot build './examples/${TEST}.java' to './${TEST_CLASS}.class'."
+fi
+  
+exit 0

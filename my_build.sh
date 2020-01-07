@@ -1,0 +1,112 @@
+#!/bin/bash
+
+export PACKAGE_NAME="javairciot"
+export IRCIOT_CLASS="jlayerirciot"
+export IRCIOT_SOURCE="${IRCIOT_CLASS}.java"
+export IRCIOT_BCODE="${IRCIOT_CLASS}.class"
+export IRCIOT_BCODE_ADDON="${IRCIOT_CLASS}\$init_constants.class"
+export RFC1459_CLASS="jlayerirc"
+export RFC1459_SOURCE="${RFC1459_CLASS}.java"
+export RFC1459_BCODE="${RFC1459_CLASS}.class"
+export RFC1459_BCODE_ADDON="${RFC1459_CLASS}\$init_constants.class"
+export CLASSPATH="/usr/share/java/json-simple-1.1.1.jar"
+export CLASSPATH="${CLASSPATH}:/usr/share/java/javatuples.jar"
+export DEBIAN_PACKAGES="libjavatuples-java libjson-simple-java"
+export COMPILE_ARGS="-Xdiags:verbose"
+export COMPILE_ARGS="-Xlint" # Warnings
+export BINARY_APT_GET="/usr/bin/apt-get"
+export BINARY_JAVAC="/usr/bin/javac"
+export BINARY_DPKG="/usr/bin/dpkg"
+export BINARY_TR="/usr/bin/tr"
+export BINARY_GREP="/bin/grep"
+export BINARY_JAR="/usr/bin/jar"
+export BINARY_CP="/bin/cp"
+export BINARY_RM="/bin/rm"
+export BINARY_RMDIR="/bin/rmdir"
+export BINARY_MKDIR="/bin/mkdir"
+
+if [ "x${1}x" == "xx" ]; then
+ echo -ne "Usage: ${0} [ build | test | clear ]\n\n"
+ echo -ne " build -- build Java IRC-IoT class\n"
+ echo -ne " test  -- build Java IRC-IoT class and all test examples\n"
+ echo -ne " clear -- clear all distribution from *.class and other\n\n"
+ exit 0
+elif [ "x${1}x" != "xbuildx" \
+    -a "x${1}x" != "xclearx" \
+    -a "x${1}x" != "xtestx" ]; then
+ echo -ne "Error: incorrect parameter\n" ; exit 1
+fi
+
+for THE_BINARY in "${BINARY_APT_GET}" "${BINARY_JAVAC}" \
+ "${BINARY_DPKG}" "${BINARY_TR}" "${BINARY_GREP}" "${BINARY_JAR}" \
+ "${BINARY_CP}" "${BINARY_RM}" "${BINARY_RMDIR}" "${BINARY_MKDIR}" ; do
+ if [ ! -x "${THE_BINARY}" ]; then
+  echo "No executable file: '${THE_BINARY}', exiting... " ; exit 1 ; fi
+done
+
+for SOURCE_FILE in "${IRCIOT_SOURCE}" "${RFC1459_SOURCE}" ; do
+ if [ ! -f "./src/${SOURCE_FILE}" ]; then
+  echo "No file: '${ISOURCE_FILE}', exiting... " ; exit 1 ; fi
+done
+ 
+for BYTECODE_FILE in "${IRCIOT_CLASS}" "${RFC1459_CLASS}" ; do
+ "${BINARY_RM}" -f "./build/${PACKAGE_NAME}/${BYTECODE_FILE}"*".class" 2>/dev/null
+done
+
+if [ "x${1}" == "xclear" ]; then
+ "${BINARY_RM}" -f "./src/"*~ 2>/dev/null
+ "${BINARY_RM}" -f "./javairciot" 2>/dev/null
+ "${BINARY_RM}" -f "./build/"*.jar 2>/dev/null
+ "${BINARY_RM}" -f "./build/${PACKAGE_NAME}/"*.class 2>/dev/null
+ "${BINARY_RMDIR}" "./build/${PACKAGE_NAME}/" 2>/dev/null
+ "${BINARY_RM}" -f *.jar *.class *~ 2>/dev/null ; exit 0 ; fi
+ 
+if [ -f /etc/debian_version ]; then
+ for DEBIAN_PACKAGE in ${DEBIAN_PACKAGES} ; do
+  "${BINARY_DPKG}" -l | \
+  "${BINARY_GREP}" " ${DEBIAN_PACKAGE} " 1>/dev/null 2>/dev/null ; ERRLV=$?
+  if [ ${ERRLV} -ne 0 ]; then
+   "${BINARY_APT_GET}" install "${DEBIAN_PACKAGE}" ; fi
+ done
+fi
+
+for JAR_PACKAGE in $(echo "${CLASSPATH}" | "${BINARY_TR}" ':' ' ') ; do
+ if [ ! -f "${JAR_PACKAGE}" ]; then
+  echo "No file: '${JAR_PACKAGE}', exiting... " ; exit 1 ; fi
+done
+
+"${BINARY_JAVAC}" ${COMPILE_ARGS} -d ./build -cp ${CLASSPATH} \
+ "./src/${IRCIOT_SOURCE}" "./src/${RFC1459_SOURCE}" ; ERRLV1=$?
+if [ ${ERRLV1} -ne 0 ]; then
+ echo "Error compiling Java IRC-IoT classes, exiting... "
+ exit 1
+else
+ cd build
+ "${BINARY_RM}" -f "./${PACKAGE_NAME}.jar" 2>/dev/null
+ "${BINARY_JAR}" -cvf "./${PACKAGE_NAME}.jar" \
+  "./${PACKAGE_NAME}/${IRCIOT_BCODE}" \
+  "./${PACKAGE_NAME}/${IRCIOT_BCODE_ADDON}" \
+  "./${PACKAGE_NAME}/${RFC1459_BCODE}" \
+  "./${PACKAGE_NAME}/${RFC1459_BCODE_ADDON}"
+ cd ..
+fi
+
+export ERRLV3=0
+if [ "x${1}" == "xtest" ]; then
+ export CLASSPATH="./build/${PACKAGE_NAME}.jar:${CLASSPATH}"
+ "${BINARY_MKDIR}" "./build/examples" 2>/dev/null
+ echo "Trying to compile examples ..."
+ for TEST_FILE in ./examples/*.java ; do
+  if [ "x${TEST_FILE}" == "x./examples/*.java" ]; then
+   echo "Warning: no files in examples directory" ; break ; fi
+  "${BINARY_JAVAC}" -d . ${COMPILE_ARGS} \
+    -cp ${CLASSPATH} "${TEST_FILE}" ; ERRLV3=$?
+  if [ ${ERRLV3} -ne 0 ]; then
+   echo "Error compiling test file '${TEST_FILE}', exiting... " ; exit 1 ; fi
+ done
+fi
+  
+if [ ${ERRLV1} -eq 0 -a ${ERRLV3} -eq 0 ]; then
+ echo -ne "\033[1;32mAll OK\033[0m (build)\n" ; fi
+
+exit 0

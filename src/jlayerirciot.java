@@ -13,6 +13,9 @@
  
 package javairciot;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Iterator;
