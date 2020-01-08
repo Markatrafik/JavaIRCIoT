@@ -25,6 +25,7 @@ export BINARY_GREP="/bin/grep"
 export BINARY_JAR="/usr/bin/jar"
 export BINARY_CP="/bin/cp"
 export BINARY_RM="/bin/rm"
+export BINARY_LN="/bin/ln"
 export BINARY_RMDIR="/bin/rmdir"
 export BINARY_MKDIR="/bin/mkdir"
 export BINARY_MVN="/usr/bin/mvn"
@@ -56,7 +57,7 @@ if [ "x${1}x" == "xmavenx" ]; then
  exit 1
 fi
 
-for THE_BINARY in "${BINARY_APT_GET}" "${BINARY_JAVAC}" \
+for THE_BINARY in "${BINARY_APT_GET}" "${BINARY_JAVAC}" "${BINARY_LN}" \
  "${BINARY_DPKG}" "${BINARY_TR}" "${BINARY_GREP}" "${BINARY_JAR}" \
  "${BINARY_CP}" "${BINARY_RM}" "${BINARY_RMDIR}" "${BINARY_MKDIR}" ; do
  if [ ! -x "${THE_BINARY}" ]; then
@@ -113,6 +114,16 @@ else
 fi
 
 export ERRLV3=0
+if [ ! -h "./${PACKAGE_NAME}" ]; then
+ if [ -d "./build/${PACKAGE_NAME}" ]; then
+  # simple builded classes
+  "${BINARY_LN}" -s "./build/${PACKAGE_NAME}" . 2>/dev/null
+ elif [ -d "./target/classes/${PACKAGE_NAME}" ]; then
+  # Maven builded classes
+  "${BINARY_LN}" -s "./target/classes/${PACKAGE_NAME}" . 2>/dev/null
+ else
+  echo "Cannot find Java IRC-IoT classes to compile tests" ; exit 1 ; fi
+fi
 if [ "x${1}" == "xtest" ]; then
  export CLASSPATH="./build/${PACKAGE_NAME}.jar:${CLASSPATH}"
  echo "Trying to compile examples ..."
