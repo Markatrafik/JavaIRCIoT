@@ -120,7 +120,7 @@ public class jlayerirc {
    //
    public String ipv4_pattern = "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}"
     + "(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
-   public String ipv6_pattern = "((([0-9A-Fa-f]{1,4}+:){7}+[0-9A-Fa-f]{1,4}+)"
+   public String ipv6_pattern = "^((([0-9A-Fa-f]{1,4}+:){7}+[0-9A-Fa-f]{1,4}+)"
     + "|(:(:[0-9A-Fa-f]{1,4}+){1,6}+)|(([0-9A-Fa-f]{1,4}+:){1,6}+:)|(::)"
     + "|(([0-9A-Fa-f]{1,4}+:)(:[0-9A-Fa-f]{1,4}+){1,5}+)|(([0-9A-Fa-f]{1,4}+:){1,2}"
     + "+(:[0-9A-Fa-f]{1,4}+){1,4}+)|(([0-9A-Fa-f]{1,4}+:){1,3}+(:[0-9A-Fa-f]{1,4}+){1,3}"
@@ -478,29 +478,24 @@ public class jlayerirc {
     return my_output;
   };
 
-  public boolean is_ipv4_address_(String in_ipv4_address) {
-    if (in_ipv4_address == null || in_ipv4_address.isEmpty()) return false;
-    boolean my_ipv4 = true;
-    Pattern my_pattern = Pattern.compile(CONST.ipv4_pattern);
+  public boolean is_pattern_(String in_string, String in_pattern) {
+    if (in_string == null || in_string.isEmpty()) return false;
+    boolean my_check = true;
+    Pattern my_pattern = Pattern.compile(in_pattern);
     try {
-      Matcher my_matcher = my_pattern.matcher(in_ipv4_address);
-      my_ipv4 = my_matcher.matches();
-      if (!my_ipv4) return false;
+      Matcher my_matcher = my_pattern.matcher(in_string);
+      my_check = my_matcher.matches();
+      if (!my_check) return false;
     } catch (PatternSyntaxException my_ex) { return false; };
-    return my_ipv4;
+    return my_check;
   };
 
-  // incomplete
+  public boolean is_ipv4_address_(String in_ipv4_address) {
+    return this.is_pattern_(in_ipv4_address, CONST.ipv4_pattern);
+  };
+
   public boolean is_ipv6_address_(String in_ipv6_address) {
-    if (in_ipv6_address == null || in_ipv6_address.isEmpty()) return false;
-    boolean my_ipv6 = true;
-    Pattern my_pattern = Pattern.compile(CONST.ipv6_pattern);
-    try {
-      Matcher my_matcher = my_pattern.matcher(in_ipv6_address);
-      my_ipv6 = my_matcher.matches();
-      if (!my_ipv6) return false;
-    } catch (PatternSyntaxException my_ex) { return false; };
-    return my_ipv6;
+    return this.is_pattern_(in_ipv6_address, CONST.ipv6_pattern);
   };
 
   public boolean is_ip_address_(String in_ip_address) {
@@ -509,18 +504,18 @@ public class jlayerirc {
     return false;
   };
 
-  // incomplete
   public boolean is_irc_nick_(String in_nick) {
-
-    return true;
+    String my_pattern = "^[" + CONST.irc_ascii_letters
+     + "_\\^\\[\\]\\{\\}][" + CONST.irc_ascii_letters
+     + CONST.irc_ascii_digits + "-_\\^\\[\\]\\{\\}]{1,12}$";
+    return this.is_pattern_(in_nick, my_pattern);
   };
 
-  // incomplete
   public boolean is_irc_channel_(String in_channel) {
-
-    return true;
+    String my_pattern = "^#[" + CONST.irc_ascii_letters
+    + CONST.irc_ascii_digits + "-_\\^\\[\\]\\{\\}]{1,24}$";
+    return this.is_pattern_(in_channel, my_pattern);
   };
 
 }
-
 

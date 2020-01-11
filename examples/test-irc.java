@@ -16,25 +16,37 @@ class test_IRC extends javairciot.jlayerirc {
     System.out.println(CONST.irciot_protocol_version);
   };
 
-  public static void irc_ip_test() {
+  public static void irc_checks() {
     jlayerirc my_irc = new jlayerirc();
-    String my_ip = "127.0.0.1";
-    System.out.print("\nTest is_ipv4_address_(\"" + my_ip + "\") = ");
-    System.out.println(my_irc.is_ipv4_address_(my_ip));
-    my_ip = "235.345.63.1";
-    System.out.print("Test is_ipv4_address_(\"" + my_ip + "\") = ");
-    System.out.println(my_irc.is_ipv4_address_(my_ip));
-    my_ip = "2a00:1450:4010:c06::8b";
-    System.out.print("\nTest is_ipv6_address_(\"" + my_ip + "\") = ");
-    System.out.println(my_irc.is_ipv6_address_(my_ip));
-    my_ip = "2a00:1450:4010:c06::8z";
-    System.out.print("Test is_ipv6_address_(\"" + my_ip + "\") = ");
-    System.out.println(my_irc.is_ipv6_address_(my_ip));
+    String my_str = "127.0.0.1";
+    System.out.print("\nTest is_ipv4_address_(\"" + my_str + "\") = ");
+    System.out.println(my_irc.is_ipv4_address_(my_str));
+    my_str = "235.345.63.1";
+    System.out.print("Test is_ipv4_address_(\"" + my_str + "\") = ");
+    System.out.println(my_irc.is_ipv4_address_(my_str));
+    my_str = "2a00:1450:4010:c06::8b";
+    System.out.print("\nTest is_ipv6_address_(\"" + my_str + "\") = ");
+    System.out.println(my_irc.is_ipv6_address_(my_str));
+    my_str = "2a00:1450:4010:c06::8z";
+    System.out.print("Test is_ipv6_address_(\"" + my_str + "\") = ");
+    System.out.println(my_irc.is_ipv6_address_(my_str));
+    my_str = "Robot";
+    System.out.print("\nTest is_irc_nick_(\"" + my_str + "\") = ");
+    System.out.println(my_irc.is_irc_nick_(my_str));
+    my_str = "##!*(";
+    System.out.print("Test is_irc_nick_(\"" + my_str + "\") = ");
+    System.out.println(my_irc.is_irc_nick_(my_str));
+    my_str = "#channel2020";
+    System.out.print("\nTest is_irc_channel_(\"" + my_str + "\") = ");
+    System.out.println(my_irc.is_irc_channel_(my_str));
+    my_str = "32r234r#_you_";
+    System.out.print("Test is_irc_channel_(\"" + my_str + "\") = ");
+    System.out.println(my_irc.is_irc_channel_(my_str));
   };
   
   public static void main(String args[]) {
     irc_testing();
-    irc_ip_test();
+    irc_checks();
   };
 }
 
