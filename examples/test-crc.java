@@ -6,7 +6,7 @@ import java.lang.*;
 import javairciot.jlayerirciot;
 
 class test_CRC extends javairciot.jlayerirciot {
-  
+
   public static void crc_testing() {
     System.out.print("This is IRC-IoT testing library, ");
     System.out.println("JLayerIRCIoT (protocol) class");

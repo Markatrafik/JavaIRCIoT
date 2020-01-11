@@ -9,12 +9,15 @@ export RFC1459_CLASS="jlayerirc"
 export RFC1459_SOURCE="${RFC1459_CLASS}.java"
 export RFC1459_BCODE="${RFC1459_CLASS}.class"
 export RFC1459_BCODE_ADDON="${RFC1459_CLASS}\$init_constants.class"
-export CLASSPATH="/usr/share/java/json-simple-1.1.1.jar"
+export CLASSPATH="/usr/share/java"
+export CLASSPATH="${CLASSPATH}:/usr/share/java/json-simple-1.1.1.jar"
+#export CLASSPATH="${CLASSPATH}:/usr/share/java/json-lib.jar"
+#export CLASSPATH="${CLASSPATH}:/usr/share/groovy/lib/groovy-json.jar"
 export CLASSPATH="${CLASSPATH}:/usr/share/java/javatuples.jar"
 export PASE_DEFAULT_UTF8=Y
 export DEBIAN_PACKAGES="libjavatuples-java libjson-simple-java maven"
 export COMPILE_ARGS="-Xdiags:verbose"
-export COMPILE_ARGS="-Xlint" # Warnings
+export COMPILE_ARGS="${COMPILE_ARGS} -Xlint" # Warnings
 export MAVEN_ARGS="-DsourceEncoding=UTF-8 -Dfile.encoding=UTF-8"
 export MAVEN_ARGS="${MAVEN_ARGS} -DdefaultCharacterEncoding=UTF-8"
 export BINARY_APT_GET="/usr/bin/apt-get"
@@ -31,7 +34,7 @@ export BINARY_MKDIR="/bin/mkdir"
 export BINARY_MVN="/usr/bin/mvn"
 
 if [ "x${1}x" == "xx" ]; then
- echo -ne "Usage: ${0} [ build | test | clear ]\n\n"
+ echo -ne "Usage: ${0} [ build | maven | test | clear ]\n\n"
  echo -ne " build -- build Java IRC-IoT library with simple Java compiling\n"
  echo -ne " maven -- build Java IRC-IoT library using Maven system\n"
  echo -ne " test  -- build Java IRC-IoT library and all test examples\n"
@@ -94,6 +97,7 @@ fi
 
 for JAR_PACKAGE in $(echo "${CLASSPATH}" | "${BINARY_TR}" ':' ' ') ; do
  if [ ! -f "${JAR_PACKAGE}" ]; then
+  if [ -d "${JAR_PACKAGE}" ]; then continue ; fi
   echo "No file: '${JAR_PACKAGE}', exiting... " ; exit 1 ; fi
 done
 

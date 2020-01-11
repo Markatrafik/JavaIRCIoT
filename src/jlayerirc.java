@@ -13,6 +13,10 @@
  
 package javairciot;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 public class jlayerirc {
 
   // Those Global options override default behavior and memory usage:
@@ -113,6 +117,16 @@ public class jlayerirc {
    public String[] irc_layer_modes = { "CLIENT", "SERVICE", "SERVER" };
    //
    public int irc_default_nick_retry = 3600; // in seconds
+   //
+   public String ipv4_pattern = "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}"
+    + "(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+   public String ipv6_pattern = "((([0-9A-Fa-f]{1,4}+:){7}+[0-9A-Fa-f]{1,4}+)"
+    + "|(:(:[0-9A-Fa-f]{1,4}+){1,6}+)|(([0-9A-Fa-f]{1,4}+:){1,6}+:)|(::)"
+    + "|(([0-9A-Fa-f]{1,4}+:)(:[0-9A-Fa-f]{1,4}+){1,5}+)|(([0-9A-Fa-f]{1,4}+:){1,2}"
+    + "+(:[0-9A-Fa-f]{1,4}+){1,4}+)|(([0-9A-Fa-f]{1,4}+:){1,3}+(:[0-9A-Fa-f]{1,4}+){1,3}"
+    + "+)|(([0-9A-Fa-f]{1,4}+:){1,4}+(:[0-9A-Fa-f]{1,4}+){1,2}+)|(([0-9A-Fa-f]{1,4}+:){1,5}"
+    + "+(:[0-9A-Fa-f]{1,4}+))|((([0-9A-Fa-f]{1,4}+:){1,4}+|:)(:(([0-9]{1,3}+\\.){3}"
+    + "+[0-9]{1,3}+))))(/[0-9]+)?";
    //
    // According RFC 1459
    //
@@ -462,6 +476,37 @@ public class jlayerirc {
     } else if (in_input instanceof String[])
       return (String[]) in_input;
     return my_output;
+  };
+
+  public boolean is_ipv4_address_(String in_ipv4_address) {
+    if (in_ipv4_address == null || in_ipv4_address.isEmpty()) return false;
+    boolean my_ipv4 = true;
+    Pattern my_pattern = Pattern.compile(CONST.ipv4_pattern);
+    try {
+      Matcher my_matcher = my_pattern.matcher(in_ipv4_address);
+      my_ipv4 = my_matcher.matches();
+      if (!my_ipv4) return false;
+    } catch (PatternSyntaxException my_ex) { return false; };
+    return my_ipv4;
+  };
+
+  // incomplete
+  public boolean is_ipv6_address_(String in_ipv6_address) {
+    if (in_ipv6_address == null || in_ipv6_address.isEmpty()) return false;
+    boolean my_ipv6 = true;
+    Pattern my_pattern = Pattern.compile(CONST.ipv6_pattern);
+    try {
+      Matcher my_matcher = my_pattern.matcher(in_ipv6_address);
+      my_ipv6 = my_matcher.matches();
+      if (!my_ipv6) return false;
+    } catch (PatternSyntaxException my_ex) { return false; };
+    return my_ipv6;
+  };
+
+  public boolean is_ip_address_(String in_ip_address) {
+    if (this.is_ipv4_address_(in_ip_address)) return true;
+    if (this.is_ipv6_address_(in_ip_address)) return true;
+    return false;
   };
 
   // incomplete
