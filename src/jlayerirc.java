@@ -21,6 +21,9 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.io.OutputStreamWriter;
+import java.io.IOException;
+import org.javatuples.Triplet;
 
 public class jlayerirc {
 
@@ -415,7 +418,89 @@ public class jlayerirc {
    public String code_RPL_EODUMP         = irc_draft == "Unreal"   ? "642" : null;
    public String code_NUMERICERROR       = irc_draft == "Bahamut"  ? "999" : null;
    //
-   public int ident_default_port = 113;
+   public String cmd_ACCOUNT    = irc_draft == "Undernet" ? "ACCOUNT"   : null;
+   public String cmd_ADMIN      = "ADMIN";
+   public String cmd_AWAY       = "AWAY";
+   public String cmd_CLARMODE   = irc_draft == "Undernet" ? "CLEARMODE" : null;
+   public String cmd_CLOSE      = irc_draft == "Undernet" ? "CLOSE"     : null;
+   public String cmd_CNOTICE    = irc_draft == "Undernet" ? "CNOTICE"   : null;
+   public String cmd_CONNECT    = irc_draft == "Undernet" ? "CONNECT"   : null;
+   public String cmd_CPRIVMSG   = irc_draft == "Undernet" ? "CPRIVMSG"  : null;
+   public String cmd_CREATE     = irc_draft == "Undernet" ? "CREATE"    : null;
+   public String cmd_CTCP       = "CTCP";
+   public String cmd_CTCPREPLY  = "CTCPREPLY";
+   public String cmd_DESTRUCT   = irc_draft == "Undernet" ? "DESCTRUCT" : null;
+   public String cmd_DESYNCH    = irc_draft == "Undernet" ? "DESYNCH"   : null;
+   public String cmd_DCC_CON    = "DCC_CONNECT";
+   public String cmd_DCC_DISCON = "DCC_DISCONNECT";
+   public String cmd_DCC_MSG    = "DCCMSG";
+   public String cmd_DIE        = irc_draft == "Undernet" ? "DIE"       : null;
+   public String cmd_DISCONNECT = "DISCONNECT";
+   public String cmd_ERROR      = "ERROR";
+   public String cmd_GLINE      = irc_draft == "Undernet" ? "GLINE"     : null;
+   public String cmd_HASH       = irc_draft == "Undernet" ? "HASH"      : null;
+   public String cmd_HELP       = irc_draft == "Undernet" ? "HELP"      : null;
+   public String cmd_INFO       = "INFO";
+   public String cmd_INVITE     = "INVITE";
+   public String cmd_ISON       = "ISON";
+   public String cmd_JOIN       = "JOIN";
+   public String cmd_JUPE       = irc_draft == "Undernet" ? "JUPE"      : null;
+   public String cmd_KICK       = "KICK";
+   public String cmd_KILL       = "KILL";
+   public String cmd_LINKS      = "LINKS";
+   public String cmd_LIST       = "LIST";
+   public String cmd_LUSERS     = irc_draft == "Undernet" ? "LUSERS"    : null;
+   public String cmd_MODE       = "MODE";
+   public String cmd_MOTD       = "MOTD";
+   public String cmd_NAMES      = "NAMES";
+   public String cmd_MAP        = irc_draft == "Undernet" ? "MAP"       : null;
+   public String cmd_NICK       = "NICK";
+   public String cmd_NOTICE     = "NOTICE";
+   public String cmd_NJOIN      = "NJOIN";
+   public String cmd_OPER       = "OPER";
+   public String cmd_OPMODE     = irc_draft == "Undernet" ? "OPMODE"    : null;
+   public String cmd_PART       = "PART";
+   public String cmd_PASS       = "PASS";
+   public String cmd_PING       = "PING";
+   public String cmd_PONG       = "PONG";
+   public String cmd_PRIVMSG    = "PRIVMSG";
+   public String cmd_PRIVS      = irc_draft == "Undernet" ? "PRIVS"     : null;
+   public String cmd_PRIVNOTICE = "PRIVNOTICE";
+   public String cmd_PROTO      = irc_draft == "Undernet" ? "PROTO"     : null;
+   public String cmd_PUBMSG     = "PUBMSG";
+   public String cmd_PUBNOTICE  = "PUBNOTICE";
+   public String cmd_REHASH     = "REHASH";
+   public String cmd_RESET      = irc_draft == "Undernet" ? "RESET"     : null;
+   public String cmd_RESTART    = "RESTART";
+   public String cmd_RPING      = irc_draft == "Undernet" ? "RPING"     : null;
+   public String cmd_RPONG      = irc_draft == "Undernet" ? "RPONG"     : null;
+   public String cmd_QUIT       = "QUIT";
+   public String cmd_SERVER     = "SERVER";
+   public String cmd_SET        = irc_draft == "Undernet" ? "SET"       : null;
+   public String cmd_SETTIME    = irc_draft == "Undernet" ? "SETTIME"   : null;
+   public String cmd_SILENCE    = irc_draft == "Undernet" ? "SILENCE"   : null;
+   public String cmd_SQUIT      = "SQUIT";
+   public String cmd_STATS      = "STATS";
+   public String cmd_SUMMON     = "SUMMON";
+   public String cmd_TIME       = "TIME";
+   public String cmd_TOPIC      = "TOPIC";
+   public String cmd_TRACE      = "TRACE";
+   public String cmd_UPING      = irc_draft == "Undernet" ? "UPING"     : null;
+   public String cmd_USER       = "USER";
+   public String cmd_USERIP     = irc_draft == "Undernet" ? "USERIP"    : null;
+   public String cmd_USERS      = "USERS";
+   public String cmd_USERHOST   = "USERHOST";
+   public String cmd_VERSION    = "VERSION";
+   public String cmd_WALLCHOPS  = irc_draft == "Undernet" ? "WALLCHOPS" : null;
+   public String cmd_WALLOPS    = "WALLOPS";
+   public String cmd_WALLUSERS  = irc_draft == "Undernet" ? "WALLUSERS" : null;
+   public String cmd_WALLVOICE  = irc_draft == "Undernet" ? "WALLVOICE" : null;
+   public String cmd_WHOIS      = "WHOIS";
+   public String cmd_WHOWAS     = "WHOWAS";
+   public String cmd_WHO        = "WHO";
+   //
+   public String ident_default_ip   = "127.0.0.1";
+   public int    ident_default_port = 113;
    //
    public init_constants() {
      if (this.irc_draft == "Undernet") {
@@ -433,6 +518,7 @@ public class jlayerirc {
   public final static init_constants CONST = new init_constants();
 
   public boolean irc_run    = false;
+  public boolean irc_debug  = CONST.irc_default_debug;
   public int     irc_init   = 0;
   public float   irc_wait   = 0;
   public boolean irc_ssl    = CONST.irc_default_ssl;
@@ -440,6 +526,9 @@ public class jlayerirc {
   public Socket  irc        = null;
   public String  irc_server = null;
   public String  irc_nick   = null;
+  //
+  public String irc_nick_old  = null;
+  public String irc_nick_base = null;
   //
   public jlayerirc() { // Class constructor
     //
@@ -551,6 +640,37 @@ public class jlayerirc {
   };
 
   // incomplete
+  public void irc_define_nick_(String in_nick) {
+    if (!this.is_irc_nick_(in_nick)) return;
+    this.irc_nick = in_nick;
+    this.irc_nick_old = in_nick;
+    this.irc_nick_base = in_nick;
+    if (this.irc_run)
+      this.irc_send_(CONST.cmd_NICK + " " + in_nick);
+  };
+
+  // incomplete
+  public int irc_send_(String irc_out) {
+    if (irc_out == null || irc_out.isEmpty()) return -1;
+    try {
+      OutputStreamWriter my_osw = new OutputStreamWriter(this.irc.getOutputStream(), "UTF-8");
+      my_osw.write(irc_out, 0, irc_out.length());
+      my_osw.flush();
+    } catch (SocketException my_ex) {
+      return -1;
+    } catch (IOException my_ex) {
+      return -1;
+    };
+    return 0;
+  };
+
+  // incomplete
+  public Triplet<Integer, String, Integer> irc_recv_(float recv_timeout) {
+
+    return Triplet.with( -1, "", 0);
+  };
+
+  // incomplete
   public Socket irc_socket_(String in_server_name) {
     try {
       InetAddress my_ip = InetAddress.getByName(in_server_name);
@@ -558,6 +678,7 @@ public class jlayerirc {
       if (this.is_ipv6_address_(my_ip_str)) {
 
       };
+      Socket my_socket = new Socket();
 
     } catch (UnknownHostException my_ex) {
       return null;
