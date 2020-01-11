@@ -16,6 +16,8 @@ package javairciot;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.net.Socket;
 import java.net.SocketException;
@@ -24,6 +26,9 @@ import java.net.UnknownHostException;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
 import org.javatuples.Triplet;
+import org.javatuples.Quartet;
+
+@SuppressWarnings("unchecked")
 
 public class jlayerirc {
 
@@ -530,6 +535,8 @@ public class jlayerirc {
   public String irc_nick_old  = null;
   public String irc_nick_base = null;
   //
+  public HashMap<String, String> irc_codes = null;
+  //
   public jlayerirc() { // Class constructor
     //
     this.irc_nick = CONST.irc_default_nick;
@@ -650,6 +657,13 @@ public class jlayerirc {
   };
 
   // incomplete
+  public int irc_random_nick_(String in_nick, boolean in_force) {
+    if (!this.is_irc_nick_(in_nick)) return -1;
+
+    return -1;
+  };
+
+  // incomplete
   public int irc_send_(String irc_out) {
     if (irc_out == null || irc_out.isEmpty()) return -1;
     try {
@@ -687,8 +701,108 @@ public class jlayerirc {
     return null;
   };
 
+  public Triplet<Integer, Integer, Float> multi_function_(String in_func,
+    String in_string, Triplet<Integer, Integer, Float> in_args) {
+    int in_ret = in_args.getValue0();
+    int in_init = in_args.getValue1();
+    float in_wait = in_args.getValue2();
+    switch (in_func) {
+      case "NICKNAMEINUSE":
+      case "ERRONEUSNICKNAME":
+        if (this.irc_random_nick_(this.irc_nick_base, false) == 1)
+          return Triplet.with(-1, 0, in_wait);
+      break;
+      case "NOTREGISTERED":
+      break;
+      case "BANNEDFROMCHAN":
+      case "CHANNELISFULL":
+      case "BADCHANNELKEY":
+      break;
+      case "NICKCHANGETOOFAST":
+      break;
+      case "NAMREPLY":
+      break;
+      case "WHOISUSER":
+      break;
+      case "ENDOFNAMES":
+      break;
+      case "WHOREPLY":
+      break;
+      case "NOSUCHNICK":
+      break;
+      case "BANNICKCHANGE":
+      case "NONICKCHANGE":
+        // restoring nick
+      break;
+      default: break;
+    };
+    return Triplet.with(in_ret, in_init, in_wait);
+  };
+
   // incomplete
   public void init_rfc1459_() {
+   init_constants C = jlayerirc.CONST;
+   HashMap<String, String> T = new HashMap<String, String>();
+   T.put(C.code_NICKNAMEINUSE,    "NICKNAMEINUSE");
+   T.put(C.code_NOTREGISTERED,    "NOTREGISTERED");
+   T.put(C.code_NAMREPLY,         "NAMREPLY");
+   T.put(C.code_WHOISUSER,        "WHOISUSER");
+   T.put(C.code_ENDOFNAMES,       "ENDOFNAMES");
+   T.put(C.code_WHOREPLY,         "WHOREPLY");
+   T.put(C.code_NOSUCHNICK,       "NOSUCHNICK");
+   T.put(C.code_CHANNELISFULL,    "CHANNELISFULL");
+   T.put(C.code_BADCHANNELKEY,    "BADCHANNELKEY");
+   T.put(C.code_ERRONEUSNICKNAME, "ERRONEUSNICKNAME");
+   T.put(C.code_NOSUCHCHANNEL,    "NOSUCHCHANNEL");
+   T.put(C.code_NOSUCHSERVER,     "NOSUCHSERVER");
+   T.put(C.code_CANNOTSENDTOCHAN, "CANNOTSENDTOCHAN");
+   T.put(C.code_TOOMANYCHANNELS,  "TOOMANYCHANNELS");
+   T.put(C.code_WASNOSUCHNICK,    "WASNOSUCHNICK");
+   T.put(C.code_TOOMANYTARGETS,   "TOOMANYTARGETS");
+   T.put(C.code_NOORIGIN,         "NOORIGIN");
+   T.put(C.code_NORECIPIENT,      "NORECIPIENT");
+   T.put(C.code_NOTEXTTOSEND,     "NOTEXTTOSEND");
+   T.put(C.code_NOOPLEVEL,        "NOOPLEVEL");
+   T.put(C.code_WILDTOPLEVEL,     "WILDTOPLEVEL");
+   T.put(C.code_UNKNOWNCOMMAND,   "UNKNOWNCOMMAND");
+   T.put(C.code_NOMOTD,           "NOMOTD");
+   T.put(C.code_NOADMININFO,      "NOADMININFO");
+   T.put(C.code_FILEERROR,        "FILEERROR");
+   T.put(C.code_NONICKNAMEGIVEN,  "NONICKNAMEGIVEN");
+   T.put(C.code_NICKCOLLISION,    "NICKCOLLISION");
+   T.put(C.code_UNAVAILRESOURCE,  "UNAVAILRESOURCE");
+   T.put(C.code_USERNOTINCHANNEL, "USERNOTINCHANNEL");
+   T.put(C.code_NOTONCHANNEL,     "NOTONCHANNEL");
+   T.put(C.code_NOLOGIN,          "NOLOGIN");
+   T.put(C.code_SUMMONDISABLED,   "SUMMONDISABLED");
+   T.put(C.code_USERSDISABLED,    "USERSDISABLED");
+   T.put(C.code_NEEDMOREPARAMS,   "NEEDMOREPARAMS");
+   T.put(C.code_USERSDONTMATCH,   "USERSDONTMATCH");
+   T.put(C.code_ALREADYREGISTERED,"ALREADYREGISTERED");
+   T.put(C.code_PASSWDMISMATCH,   "PASSWDMISMATCH");
+   T.put(C.code_YOUREBANNEDCREEP, "YOUREBANNEDCREEP");
+   T.put(C.code_YOUWILLBEBANNED,  "YOUWILLBEBANNED");
+   T.put(C.code_KEYSET,           "KEYSET");
+   T.put(C.code_UNKNOWNMODE,      "UNKNOWNMODE");
+   T.put(C.code_INVITEONLYCHAN,   "INVITEONLYCHAN");
+   T.put(C.code_BADCHANNELMASK,   "BADCHANNELMASK");
+   //
+   if (CONST.irc_draft == "Undernet") {
+     T.put(C.code_BANNICKCHANGE,  "BANNICKCHANGE");
+     T.put(C.code_USERIP,         "USERIP");
+     T.put(C.code_INVALIDUSERNAME,"INVALIDUSERNAME");
+   } else if (CONST.irc_draft == "Unreal") {
+     T.put(C.code_NONICKCHANGE,   "NONICKCHANGE");
+     T.put(C.code_WHOISBOT,       "WHOISBOT");
+     T.put(C.code_NOSUCHSERVICE,  "NOSUCHSERVICE");
+     T.put(C.code_NOINVITE,       "NOINVITE");
+   } else { // Unknown extending
+     T.put(C.code_NOCHANMODES,    "NOCHANMODES");
+     T.put(C.code_RESTRICTED,     "RESTRICTED");
+   };
+   //
+   this.irc_codes = T;
+   //
 
   };
 
