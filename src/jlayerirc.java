@@ -16,6 +16,11 @@ package javairciot;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.HashMap;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class jlayerirc {
 
@@ -427,11 +432,21 @@ public class jlayerirc {
 
   public final static init_constants CONST = new init_constants();
 
-  public boolean irc_ssl = CONST.irc_default_ssl;
-  public boolean irc_ident = CONST.irc_default_ident;
+  public boolean irc_run    = false;
+  public int     irc_init   = 0;
+  public float   irc_wait   = 0;
+  public boolean irc_ssl    = CONST.irc_default_ssl;
+  public boolean irc_ident  = CONST.irc_default_ident;
+  public Socket  irc        = null;
+  public String  irc_server = null;
+  public String  irc_nick   = null;
   //
   public jlayerirc() { // Class constructor
     //
+    this.irc_nick = CONST.irc_default_nick;
+    //
+    this.irc_run  = false;
+    this.irc_init = 0;
 
   };
 
@@ -516,6 +531,69 @@ public class jlayerirc {
     + CONST.irc_ascii_digits + "-_\\^\\[\\]\\{\\}]{1,24}$";
     return this.is_pattern_(in_channel, my_pattern);
   };
+
+  // incomplete
+  public boolean irc_compare_nicks_(String ref_nick, String cmp_nick) {
+
+    return false;
+  };
+
+  // incomplete
+  public boolean irc_compare_channels_(String ref_channel, String cmp_channel) {
+
+    return false;
+  };
+
+  // incomplete
+  public boolean irc_check_mask_(String in_from, String in_mask) {
+
+    return false;
+  };
+
+  // incomplete
+  public Socket irc_socket_(String in_server_name) {
+    try {
+      InetAddress my_ip = InetAddress.getByName(in_server_name);
+      String my_ip_str = my_ip.toString();
+      if (this.is_ipv6_address_(my_ip_str)) {
+
+      };
+
+    } catch (UnknownHostException my_ex) {
+      return null;
+    };
+
+    return null;
+  };
+
+  // incomplete
+  public void init_rfc1459_() {
+
+  };
+
+  // incomplete
+  public void irc_process_() {
+    this.init_rfc1459_();
+    // try {
+
+      this.irc = this.irc_socket_(this.irc_server);
+
+    // } catch (SocketException my_ex) {
+
+    // };
+    while (this.irc_run) {
+      // try {
+
+
+      // } catch (SocketException my_ex) {
+
+      // } finally {
+
+      // };
+    }; // while irc_run
+
+  };
+
 
 }
 
