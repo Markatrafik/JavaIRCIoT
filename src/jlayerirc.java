@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.HashMap;
 import java.net.Socket;
 import java.net.SocketException;
@@ -26,7 +27,6 @@ import java.net.UnknownHostException;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
 import org.javatuples.Triplet;
-import org.javatuples.Quartet;
 
 @SuppressWarnings("unchecked")
 
@@ -45,6 +45,11 @@ public class jlayerirc {
    private static final long serialVersionUID = 32765;
    //
    public boolean irc_default_debug = DO_debug_library;
+   //
+   public float irc_first_wait = 28f;
+   public float irc_micro_wait = 0.12f;
+   public float irc_default_wait = 28f;
+   public float irc_latency_wait = 1f;
    //
    public String irc_default_nick = "MyBot";
    public String irc_default_info = "IRC-IoT Bot";
@@ -148,7 +153,7 @@ public class jlayerirc {
    public String irc_ascii_letters = irc_ascii_lowercase + irc_ascii_uppercase;
    public String irc_ascii_digits = "0123456789";
    public String irc_special_chars = "-[]\\`^{}";
-   public String irc_nick_first_char = irc_ascii_letters + irc_special_chars;
+   public String irc_nick_first_char = irc_ascii_letters + "[]\\`^{}";
    public String irc_nick_chars = irc_ascii_letters + irc_ascii_digits + irc_special_chars;
    public String irc_translation_in = irc_ascii_uppercase + "[]\\^";
    public String irc_translation_out = irc_ascii_lowercase + "{}|~";
@@ -510,6 +515,7 @@ public class jlayerirc {
    public init_constants() {
      if (this.irc_draft == "Undernet") {
        this.default_mtu = 450;
+       this.irc_max_nick_length = 12;
        this.code_STATSTLINE = "246";
        this.code_STATSGLINE = "247";
      };
@@ -532,10 +538,14 @@ public class jlayerirc {
   public String  irc_server = CONST.irc_default_server;
   public int     irc_port   = CONST.irc_default_port;
   public String  irc_nick   = CONST.irc_default_nick;
+  public int     irc_nick_length = CONST.irc_max_nick_length;
   //
   public String irc_nick_old  = null;
   public String irc_nick_base = null;
+  public String irc_nick_try  = "";
   public String irc_layer_mode = CONST.irc_layer_modes[0];
+  //
+  public int join_retry = 0;
   //
   public HashMap<String, String> irc_codes = null;
   public HashMap<String, String> irc_commands = null;
@@ -553,6 +563,8 @@ public class jlayerirc {
     this.irc_wait = 0;
     //
     this.irc_layer_mode = CONST.irc_layer_modes[0];
+    //
+    this.join_retry = 0;
 
   };
 
@@ -603,11 +615,11 @@ public class jlayerirc {
     if (in_string == null || in_string.isEmpty()) return false;
     boolean my_check = true;
     Pattern my_pattern = Pattern.compile(in_pattern);
-    try {
+    // try {
       Matcher my_matcher = my_pattern.matcher(in_string);
       my_check = my_matcher.matches();
       if (!my_check) return false;
-    } catch (PatternSyntaxException my_ex) { return false; };
+    // } catch (PatternSyntaxException my_ex) { return false; };
     return my_check;
   };
 
@@ -626,15 +638,16 @@ public class jlayerirc {
   };
 
   public boolean is_irc_nick_(String in_nick) {
+    if (in_nick.length() > CONST.irc_max_nick_length) return false;
     String my_pattern = "^[" + CONST.irc_ascii_letters
-     + "_\\^\\[\\]\\{\\}][" + CONST.irc_ascii_letters
-     + CONST.irc_ascii_digits + "-_\\^\\[\\]\\{\\}]{1,12}$";
+     + "_`\\\\\\^\\[\\]\\{\\}][" + CONST.irc_ascii_letters
+     + CONST.irc_ascii_digits + "\\-_`\\\\\\^\\[\\]\\{\\}]{1,12}$";
     return this.is_pattern_(in_nick, my_pattern);
   };
 
   public boolean is_irc_channel_(String in_channel) {
     String my_pattern = "^#[" + CONST.irc_ascii_letters
-    + CONST.irc_ascii_digits + "-_\\^\\[\\]\\{\\}]{1,24}$";
+    + CONST.irc_ascii_digits + "\\-_\\^\\[\\]\\{\\}]{1,24}$";
     return this.is_pattern_(in_channel, my_pattern);
   };
 
@@ -666,11 +679,30 @@ public class jlayerirc {
       this.irc_send_(CONST.cmd_NICK + " " + in_nick);
   };
 
-  // incomplete
   public int irc_random_nick_(String in_nick, boolean in_force) {
     if (!this.is_irc_nick_(in_nick)) return -1;
-
-    return -1;
+    char[] my_chars;
+    Random my_rnd = new Random();
+    String irc_nick = in_nick;
+    my_chars = CONST.irc_ascii_digits.toCharArray();
+    for (int _idx = 0;_idx < my_rnd.nextInt(3) + 1;_idx++)
+      irc_nick += my_chars[my_rnd.nextInt(my_chars.length)];
+    if (this.join_retry > 2 || in_force) {
+      int nick_length = my_rnd.nextInt(this.irc_nick_length - 2) + 2;
+      my_chars = CONST.irc_nick_first_char.toCharArray();
+      irc_nick = "";
+      irc_nick += my_chars[my_rnd.nextInt(my_chars.length)];
+      my_chars = CONST.irc_nick_chars.toCharArray();
+      for (int _idx = 1;_idx < nick_length;_idx++)
+        irc_nick += my_chars[my_rnd.nextInt(my_chars.length)];
+    };
+    int ret = this.irc_send_(CONST.cmd_NICK + " " + irc_nick);
+    this.irc_nick_try = irc_nick;
+    if (ret == 0) {
+      this.irc_nick_old = this.irc_nick;
+      this.irc_nick = irc_nick;
+    };
+    return ret;
   };
 
   // incomplete
@@ -680,6 +712,8 @@ public class jlayerirc {
       OutputStreamWriter my_osw = new OutputStreamWriter(this.irc.getOutputStream(), "UTF-8");
       my_osw.write(irc_out, 0, irc_out.length());
       my_osw.flush();
+    } catch (NullPointerException my_ex) {
+      return -1;
     } catch (SocketException my_ex) {
       return -1;
     } catch (IOException my_ex) {
@@ -711,6 +745,7 @@ public class jlayerirc {
     return null;
   };
 
+  // incomplete
   public Triplet<Integer, Integer, Float> multi_function_(String in_func,
     String in_string, Triplet<Integer, Integer, Float> in_args) {
     int in_ret = in_args.getValue0();
@@ -723,14 +758,25 @@ public class jlayerirc {
           return Triplet.with(-1, 0, in_wait);
       break;
       case "NOTREGISTERED":
-      break;
+        // if (this.irc_random_nick_(this.irc_nick, false) == 1)
+        //  return Triplet.with(-1, 0, in_wait);
+        return Triplet.with(in_ret, 1, CONST.irc_default_wait);
       case "BANNEDFROMCHAN":
       case "CHANNELISFULL":
       case "BADCHANNELKEY":
+        if (this.join_retry > 1) {
+          if (this.irc_random_nick_(this.irc_nick, false) == 1) {
+            this.join_retry += 1;
+            return Triplet.with(-1, 0, in_wait);
+          };
+          return Triplet.with(in_ret, 3, CONST.irc_default_wait);
+        };
       break;
       case "NICKCHANGETOOFAST":
+        in_wait = 3; // ... will be calculated from warning, not by RFC 1459 ...
       break;
       case "NAMREPLY":
+
       break;
       case "WHOISUSER":
       break;

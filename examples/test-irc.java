@@ -42,6 +42,15 @@ class test_IRC extends javairciot.jlayerirc {
     my_str = "32r234r#_you_";
     System.out.print("Test is_irc_channel_(\"" + my_str + "\") = ");
     System.out.println(my_irc.is_irc_channel_(my_str));
+    System.out.print("\nTest irc_random_nick_(\"Test\", false) = \"");
+    int my_int = my_irc.irc_random_nick_("Test", false);
+    System.out.println(my_irc.irc_nick_try + "\"");
+    System.out.print("Test irc_random_nick_(\"Test\", true) = \"");
+    my_int = my_irc.irc_random_nick_("Test", true);
+    my_str = my_irc.irc_nick_try;
+    System.out.println(my_str + "\"");
+    System.out.print("Test is_irc_nick_(\"" + my_str + "\") = ");
+    System.out.println(my_irc.is_irc_nick_(my_str));
   };
   
   public static void main(String args[]) {
