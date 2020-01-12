@@ -56,6 +56,9 @@ if [ "x${1}x" == "xmavenx" ]; then
   echo "No executable file: '${BINARY_MVN}', exiting... " ; exit 1 ; fi
  "${BINARY_MVN}" ${MAVEN_ARGS} ; ERRLV8=$?
  if [ ${ERRLV8} -eq 0 ]; then
+  if [ -f "./target/classes/${PACKAGE_NAME}/${IRCIOT_BCODE}" ]; then
+   # maven builded classes
+   "${BINARY_LN}" -s "./target/classes/${PACKAGE_NAME}" . 2>/dev/null  ; fi
  echo -ne "\033[1;32mAll OK\033[0m (maven)\n" ; exit 0 ; fi
  exit 1
 fi

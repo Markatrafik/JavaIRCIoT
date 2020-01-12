@@ -529,20 +529,30 @@ public class jlayerirc {
   public boolean irc_ssl    = CONST.irc_default_ssl;
   public boolean irc_ident  = CONST.irc_default_ident;
   public Socket  irc        = null;
-  public String  irc_server = null;
-  public String  irc_nick   = null;
+  public String  irc_server = CONST.irc_default_server;
+  public int     irc_port   = CONST.irc_default_port;
+  public String  irc_nick   = CONST.irc_default_nick;
   //
   public String irc_nick_old  = null;
   public String irc_nick_base = null;
+  public String irc_layer_mode = CONST.irc_layer_modes[0];
   //
   public HashMap<String, String> irc_codes = null;
+  public HashMap<String, String> irc_commands = null;
   //
   public jlayerirc() { // Class constructor
     //
+    this.irc_server = CONST.irc_default_server;
+    this.irc_port = CONST.irc_default_port;
     this.irc_nick = CONST.irc_default_nick;
+    this.irc_ssl  = CONST.irc_default_ssl;
+    this.irc_ident = CONST.irc_default_ident;
     //
     this.irc_run  = false;
     this.irc_init = 0;
+    this.irc_wait = 0;
+    //
+    this.irc_layer_mode = CONST.irc_layer_modes[0];
 
   };
 
@@ -743,6 +753,7 @@ public class jlayerirc {
   public void init_rfc1459_() {
    init_constants C = jlayerirc.CONST;
    HashMap<String, String> T = new HashMap<String, String>();
+   HashMap<String, String> K = new HashMap<String, String>();
    T.put(C.code_NICKNAMEINUSE,    "NICKNAMEINUSE");
    T.put(C.code_NOTREGISTERED,    "NOTREGISTERED");
    T.put(C.code_NAMREPLY,         "NAMREPLY");
@@ -786,7 +797,6 @@ public class jlayerirc {
    T.put(C.code_UNKNOWNMODE,      "UNKNOWNMODE");
    T.put(C.code_INVITEONLYCHAN,   "INVITEONLYCHAN");
    T.put(C.code_BADCHANNELMASK,   "BADCHANNELMASK");
-   //
    if (CONST.irc_draft == "Undernet") {
      T.put(C.code_BANNICKCHANGE,  "BANNICKCHANGE");
      T.put(C.code_USERIP,         "USERIP");
@@ -800,10 +810,59 @@ public class jlayerirc {
      T.put(C.code_NOCHANMODES,    "NOCHANMODES");
      T.put(C.code_RESTRICTED,     "RESTRICTED");
    };
-   //
    this.irc_codes = T;
    //
-
+   if (this.irc_layer_mode == CONST.irc_layer_modes[0]) {
+     K.put(C.cmd_PONG,   "CMD:PONG");
+     K.put(C.cmd_PRIVMSG,"CMD:PRIVMSG");
+     K.put(C.cmd_INVITE, "CMD:INVITE");
+     K.put(C.cmd_JOIN,   "CMD:JOIN");
+     K.put(C.cmd_KICK,   "CMD:KICK");
+     K.put(C.cmd_KILL,   "CMD:KILL");
+     K.put(C.cmd_MODE,   "CMD:MODE");
+     K.put(C.cmd_NICK,   "CMD:NICK");
+     K.put(C.cmd_NOTICE, "CMD:NOTICE");
+     K.put(C.cmd_PART,   "CMD:PART");
+     K.put(C.cmd_QUIT,   "CMD:QUIT");
+     K.put(C.cmd_ERROR,  "CMD:ERROR");
+   } else { // RFC 2813
+     K.put(C.cmd_PASS,   "SRV:PASS");
+     K.put(C.cmd_SERVER, "SRV:SERVER");
+     K.put(C.cmd_NICK,   "SRV:NICK");
+     K.put(C.cmd_QUIT,   "SRV:SQUIT");
+     K.put(C.cmd_JOIN,   "SRV:JOIN");
+     K.put(C.cmd_NJOIN,  "SRV:NJOIN");
+     K.put(C.cmd_LINKS,  "SRV:LINKS");
+     K.put(C.cmd_KILL,   "SRV:KILL");
+     K.put(C.cmd_NAMES,  "SRV:INVITE");
+     K.put(C.cmd_STATS,  "SRV:STATS");
+     K.put(C.cmd_CONNECT,"SRV:CONNECT");
+     K.put(C.cmd_TRACE,  "SRV:TRACE");
+     K.put(C.cmd_ADMIN,  "SRV:ADMIN");
+     K.put(C.cmd_WHO,    "SRV:WHO");
+     K.put(C.cmd_INFO,   "SRV:INFO");
+     K.put(C.cmd_WHOIS,  "SRV:WHOIS");
+     K.put(C.cmd_WHOWAS, "SRV:WHOWAS");
+     K.put(C.cmd_AWAY,   "SRV:AWAY");
+     K.put(C.cmd_RESTART,"SRV:RESTART");
+     K.put(C.cmd_SUMMON, "SRV:SUMMON");
+     K.put(C.cmd_USERS,  "SRV:USERS");
+     K.put(C.cmd_WALLOPS,"SRV:WALLOPS");
+     K.put(C.cmd_USERHOST,"SRV:USERHOST");
+     K.put(C.cmd_TOPIC,  "SRV:TOPIC");
+     K.put(C.cmd_KICK,   "SRV:KICK");
+     K.put(C.cmd_PONG,   "SRV:PONG");
+     K.put(C.cmd_PART,   "SRV:PART");
+     K.put(C.cmd_ERROR,  "SRV:ERROR");
+     K.put(C.cmd_PRIVMSG,"SRV:PRIVMSG");
+     K.put(C.cmd_PUBMSG, "SRV:PUBMSG");
+     K.put(C.cmd_PUBNOTICE,"SRV:PUBNOTICE");
+     K.put(C.cmd_NOTICE, "SRV:NOTICE");
+     K.put(C.cmd_PRIVNOTICE,"SRV:PRIVNOTICE");
+     K.put(C.cmd_ISON,   "SRV:ISON");
+     K.put(C.cmd_REHASH, "SRV:REHASH");
+   };
+   this.irc_commands = K;
   };
 
   // incomplete
