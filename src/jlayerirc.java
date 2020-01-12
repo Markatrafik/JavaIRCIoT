@@ -38,7 +38,7 @@ public class jlayerirc {
 
   public static final class init_constants {
    //
-   public String irciot_library_version = "0.0.167";
+   public String irciot_library_version = "0.0.168";
    //
    public String irciot_protocol_version = "0.3.29";
    //
@@ -176,7 +176,7 @@ public class jlayerirc {
    // "RFC1459", "Undernet", "Unreal", "Bahamut",   "Inspl", "Hybrid",
    // "RusNet",  "Shadow",   "ircu",   "Nefarious", "Rock",  "Synchronet",
    // "solid",   "PieXus",   "ratbox", "Charybdis", "pure",  "Rubl",
-   // "ngl",     "ConfRoom", "pircd"
+   // "ngl",     "ConfRoom", "pircd",  "JavaIRCIoT"
    //
    public int default_mtu = 480;
    //
@@ -539,6 +539,8 @@ public class jlayerirc {
   public int     irc_port   = CONST.irc_default_port;
   public String  irc_nick   = CONST.irc_default_nick;
   public int     irc_nick_length = CONST.irc_max_nick_length;
+  public String  irc_info   = CONST.irc_default_info;
+  public String  irc_quit   = CONST.irc_default_quit;
   //
   public String irc_nick_old  = null;
   public String irc_nick_base = null;
@@ -743,6 +745,24 @@ public class jlayerirc {
     };
 
     return null;
+  };
+
+  public int irc_pong_(String irc_input) {
+    String[] my_arr = irc_input.split(":", 2);
+    int ret = this.irc_send_(CONST.cmd_PONG + " " + my_arr[1] + "\r\n");
+    return ret;
+  };
+
+  public int irc_quit_() {
+    int ret = this.irc_send_(CONST.cmd_QUIT + " :" + this.irc_quit + "\r\n");
+    return ret;
+  };
+
+  // incomplete
+  public int irc_umode_(String in_channel, String in_nicks, String in_change, String in_umode) {
+    if (!this.is_irc_channel_(in_channel)) return -1;
+
+    return -1;
   };
 
   // incomplete
