@@ -687,8 +687,8 @@ public class jlayerirciot {
     try {
       JSONParser my_parser = new JSONParser();
       JSONObject my_datums = (JSONObject) my_parser.parse(in_datumset);
-    } catch (ParseException e) {
-      // e.printStackTrace();
+    } catch (ParseException my_ex) {
+      // my_ex.printStackTrace();
       return "";
     };
     String my_irciot = "";
@@ -721,8 +721,8 @@ public class jlayerirciot {
     JSONParser my_parser = new JSONParser();
     try {
       my_json_obj = my_parser.parse(my_datumset);
-    } catch (ParseException e) {
-      // e.printStackTrace();
+    } catch (ParseException my_ex) {
+      // my_ex.printStackTrace();
       return Triplet.with("", 0, 0);
     };
     int my_total = 0;
@@ -747,7 +747,7 @@ public class jlayerirciot {
       my_datumset = my_datums_array.toString();
       try {
         my_datums = (JSONArray) my_parser.parse(my_datumset);
-      } catch (ParseException e) {
+      } catch (ParseException my_ex) {
         return Triplet.with("", 0, 0);
       };
     }; // in_skip
@@ -757,8 +757,8 @@ public class jlayerirciot {
         this.current_mid = save_mid; // mid rollback
       try {
         my_json_obj = my_parser.parse(my_datumset);
-      } catch (ParseException e) {
-        // e.printStackTrace();
+      } catch (ParseException my_ex) {
+        // my_ex.printStackTrace();
         return Triplet.with("", 0, 0);
       };
       int one_datum = 0;

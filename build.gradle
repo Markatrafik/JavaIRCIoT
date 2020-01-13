@@ -3,13 +3,38 @@
 
 apply plugin: 'com.android.library'
 
+ext {
+    PUBLISH_GROUP_ID="javairciot"
+    PUBLISH_ARTIFACT_ID="javairciot"
+    PUBLISH_VERSION = "0.0.168"
+    BUILD_TOOLS = "25.0.0"
+    TARGET_SDK = 25
+}
 android {
-    compileSdkVersion 19
-    buildToolsVersion "25.0.0"
-
+    compileSdkVersion TARGET_SDK
+    buildToolsVersion BUILD_TOOLS
     defaultConfig {
-        minSdkVersion 4
-        targetSdkVersion 17
+        minSdkVersion TARGET_SDK
+        targetSdkVersion TARGET_SDK
+        versionCode 1
+        versionName PUBLISH_VERSION
+    }
+    lintOptions {
+        checkReleaseBuilds false
+    }
+    buildTypes {
+        debug {
+            debuggable true
+        }
+        release {
+            debuggable false
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        incremental false
     }
 }
 
@@ -18,7 +43,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.3'
     }
 }
 
@@ -27,4 +52,5 @@ allprojects {
         jcenter()
     }
 }
+
 
