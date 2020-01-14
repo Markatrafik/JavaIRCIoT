@@ -765,6 +765,22 @@ public class jlayerirc {
     return -1;
   };
 
+  public int irc_op_(String in_channel, String in_nicks) {
+    return this.irc_umode_(in_channel, in_nicks, CONST.irc_mode_add, CONST.irc_umode_op);
+  };
+
+  public int irc_deop_(String in_channel, String in_nicks) {
+    return this.irc_umode_(in_channel, in_nicks, CONST.irc_mode_del, CONST.irc_umode_op);
+  };
+
+  public int irc_voice_(String in_channel, String in_nicks) {
+    return this.irc_umode_(in_channel, in_nicks, CONST.irc_mode_add, CONST.irc_umode_voice);
+  };
+
+  public int irc_devoice_(String in_channel, String in_nicks) {
+    return this.irc_umode_(in_channel, in_nicks, CONST.irc_mode_del, CONST.irc_umode_voice);
+  };
+
   // incomplete
   public Triplet<Integer, Integer, Float> multi_function_(String in_func,
     String in_string, Triplet<Integer, Integer, Float> in_args) {
@@ -796,8 +812,22 @@ public class jlayerirc {
         in_wait = 3; // ... will be calculated from warning, not by RFC 1459 ...
       break;
       case "NAMREPLY":
-
-      break;
+        try {
+          String[] my_arr = in_string.split(":", 3);
+          if (my_arr[0] == "") {
+            my_arr = my_arr[2].split(" ");
+            for (int my_idx = 0;my_idx < my_arr.length;my_idx++) {
+              String my_nick = my_arr[my_idx];
+              if (my_nick.charAt(0) == '@') {
+                my_nick = my_nick.substring(1);
+                // this.irc_track_add_nick_(my_nick, null, null, null);
+              };
+            };
+          };
+        } catch (ArrayIndexOutOfBoundsException my_ex) {
+          return Triplet.with(in_ret, in_init, in_wait);
+        };
+        return Triplet.with(in_ret, in_init, CONST.irc_default_wait);
       case "WHOISUSER":
       break;
       case "ENDOFNAMES":
