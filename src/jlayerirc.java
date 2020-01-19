@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
+import java.lang.Thread;
 import org.javatuples.Triplet;
 
 @SuppressWarnings("unchecked")
@@ -46,10 +47,10 @@ public class jlayerirc {
    //
    public boolean irc_default_debug = DO_debug_library;
    //
-   public float irc_first_wait = 28f;
-   public float irc_micro_wait = 0.12f;
-   public float irc_default_wait = 28f;
-   public float irc_latency_wait = 1f;
+   public int irc_first_wait = 28000; // in milliseconds
+   public int irc_micro_wait = 120;
+   public int irc_default_wait = 28000;
+   public int irc_latency_wait = 1000;
    //
    public String irc_default_nick = "MyBot";
    public String irc_default_info = "IRC-IoT Bot";
@@ -530,15 +531,16 @@ public class jlayerirc {
 
   public boolean irc_run    = false;
   public boolean irc_debug  = CONST.irc_default_debug;
-  public int     irc_init   = 0;
-  public float   irc_wait   = 0;
   public boolean irc_ssl    = CONST.irc_default_ssl;
   public boolean irc_ident  = CONST.irc_default_ident;
   public Socket  irc        = null;
   public String  irc_server = CONST.irc_default_server;
   public int     irc_port   = CONST.irc_default_port;
+  public String  irc_host   = null;
+  public String  irc_password = CONST.irc_default_password;
   public String  irc_nick   = CONST.irc_default_nick;
   public int     irc_nick_length = CONST.irc_max_nick_length;
+  public String  irc_user   = this.irc_tolower_(CONST.irc_default_nick);
   public String  irc_info   = CONST.irc_default_info;
   public String  irc_quit   = CONST.irc_default_quit;
   //
@@ -554,6 +556,12 @@ public class jlayerirc {
   //
   public jlayerirc() { // Class constructor
     //
+    try {
+      this.irc_host = InetAddress.getLocalHost().getHostName();
+    } catch (UnknownHostException my_ex) {
+      this.irc_host = "localhost";
+    };
+    //
     this.irc_server = CONST.irc_default_server;
     this.irc_port = CONST.irc_default_port;
     this.irc_nick = CONST.irc_default_nick;
@@ -561,8 +569,6 @@ public class jlayerirc {
     this.irc_ident = CONST.irc_default_ident;
     //
     this.irc_run  = false;
-    this.irc_init = 0;
-    this.irc_wait = 0;
     //
     this.irc_layer_mode = CONST.irc_layer_modes[0];
     //
@@ -725,7 +731,7 @@ public class jlayerirc {
   };
 
   // incomplete
-  public Triplet<Integer, String, Integer> irc_recv_(float recv_timeout) {
+  public Triplet<Integer, String, Integer> irc_recv_(int recv_timeout) {
 
     return Triplet.with( -1, "", 0);
   };
@@ -742,6 +748,8 @@ public class jlayerirc {
 
     } catch (UnknownHostException my_ex) {
       return null;
+    // } catch (SocketException my_ex) {
+    //  return null;
     };
 
     return null;
@@ -782,11 +790,11 @@ public class jlayerirc {
   };
 
   // incomplete
-  public Triplet<Integer, Integer, Float> multi_function_(String in_func,
-    String in_string, Triplet<Integer, Integer, Float> in_args) {
+  public Triplet<Integer, Integer, Integer> multi_function_(String in_func,
+    String in_string, Triplet<Integer, Integer, Integer> in_args) {
     int in_ret = in_args.getValue0();
     int in_init = in_args.getValue1();
-    float in_wait = in_args.getValue2();
+    int in_wait = in_args.getValue2();
     switch (in_func) {
       case "NICKNAMEINUSE":
       case "ERRONEUSNICKNAME":
@@ -963,21 +971,63 @@ public class jlayerirc {
 
   // incomplete
   public void irc_process_() {
+    //
     this.init_rfc1459_();
-    // try {
-
+    //
+    int irc_init = 0;
+    int irc_wait = CONST.irc_first_wait;
+    int irc_ret  = 0;
+    String irc_vuid = CONST.api_vuid_cfg + "0";
+    StringBuffer irc_input_buffer = new StringBuffer(CONST.irc_buffer_size);
+    //
+    int try_sock = 0;
+    do {
+      // Thread.speep(CONST.irc_first_wait);
       this.irc = this.irc_socket_(this.irc_server);
-
-    // } catch (SocketException my_ex) {
-
-    // };
+    } while (this.irc != null && try_sock++ < 3);
+    //
     while (this.irc_run) {
       // try {
+        if (this.irc == null) {
+          // Thread.speep(CONST.irc_micro_wait);
+          this.irc = this.irc_socket_(this.irc_server);
+          irc_init = 0;
+        };
+        if (irc_init < 6)
+          irc_init += 1;
+        if (irc_init == 1) {
 
+        } else if (irc_init == 2) {
+          if (this.irc_password != null)
+            this.irc_send_(CONST.cmd_PASS + " " + this.irc_password);
+          this.irc_user = this.irc_tolower_(this.irc_nick);
+          if (this.irc_send_(CONST.cmd_USER + " " + this.irc_user
+            + " " + this.irc_host + " 1 :" + this.irc_info) == -1)
+            irc_init = 0;
+        } else if (irc_init == 3) {
+
+        } else if (irc_init == 4) {
+
+        } else if (irc_init == 5) {
+
+        };
+        if (irc_init > 0) {
+
+        };
+
+        irc_wait = CONST.irc_default_wait;
+
+        if (irc_ret == -1) {
+
+        };
+
+        //
+
+        if (irc_init > 5) {
+
+        };
 
       // } catch (SocketException my_ex) {
-
-      // } finally {
 
       // };
     }; // while irc_run

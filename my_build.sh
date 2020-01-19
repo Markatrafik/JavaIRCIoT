@@ -67,6 +67,7 @@ if [ "x${1}x" == "xgradlex" -o "x${1}x" == "xandroidx" ]; then
   for TEST_PATH in \
    ~"/Android/Sdk" \
    ~"/Library/Adroid/sdk" \
+   ~"/sdk/android-sdk-linux" \
    "/usr/lib/android-sdk" \
    "/usr/lib/android/sdk" \
    "/usr/lib/Android/Sdk" \
@@ -74,6 +75,7 @@ if [ "x${1}x" == "xgradlex" -o "x${1}x" == "xandroidx" ]; then
    "/usr/local/Android/SDK" \
    "/usr/local/android/SDK" \
    "/usr/local/android/sdk" \
+   "/opt/android-sdk-linux" \
    "/opt/android/sdk" \
    "/opt/android/Sdk" \
    "/opt/Android/SDK" ; do
@@ -82,7 +84,7 @@ if [ "x${1}x" == "xgradlex" -o "x${1}x" == "xandroidx" ]; then
     export ANDROID_HOME="${TEST_PATH}"
     export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
     export ANDROID_SDK_ROOT="${TEST_PATH}"
-    echo "FOUND! '${ANDROID_HOME}'" ; break ; fi
+    echo -ne "FOUND! '\033[1m${ANDROID_HOME}\033[0m'\n" ; break ; fi
   done ; fi
  if [ "x${ANDROID_HOME}x" == "xx" ]; then
   echo "FAILED! Cannot find, exiting ..." ; exit 1 ; fi
@@ -99,6 +101,7 @@ if [ "x${1}x" == "xgradlex" -o "x${1}x" == "xandroidx" ]; then
   for TEST_PATH in \
    ~"/Android/Ndk" \
    ~"/Library/Adroid/ndk" \
+   ~"/Android/Sdk/ndk-bundle" \
    "/usr/lib/android-ndk" \
    "/usr/lib/android/ndk" \
    "/usr/lib/Android/Ndk" \
@@ -110,7 +113,7 @@ if [ "x${1}x" == "xgradlex" -o "x${1}x" == "xandroidx" ]; then
     export ANDROID_NDK="${TEST_PATH}"
     export ANDROID_NDK_HOME="${TEST_PATH}"
     export PATH="${PATH}:${ANDROID_NDK}"
-    echo "FOUND! '${ANDROID_NDK}'" ; break ; fi
+    echo -ne "FOUND! '\033[1m${ANDROID_NDK}\033[0m'\n" ; break ; fi
   done ; fi
  export SDK_VERSION="$("${ANDROID_ADB}" | "${BINARY_GREP}" '^Version\ [1-9]*\.' | \
   "${BINARY_SED}" 's/Version\ \([0-9]*\)\..*/\1/g')"
