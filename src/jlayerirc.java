@@ -18,8 +18,10 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.HashMap;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.InetAddress;
@@ -39,7 +41,7 @@ public class jlayerirc {
 
   public static final class init_constants {
    //
-   public String irciot_library_version = "0.0.168";
+   public String irciot_library_version = "0.0.169";
    //
    public String irciot_protocol_version = "0.3.29";
    //
@@ -128,6 +130,8 @@ public class jlayerirc {
    //
    public int irc_queue_input  = 0;
    public int irc_queue_output = 1;
+   //
+   public int irc_queue_size   = 1024;
    //
    public int irc_recon_steps  = 8;
    //
@@ -540,14 +544,25 @@ public class jlayerirc {
   public String  irc_password = CONST.irc_default_password;
   public String  irc_nick   = CONST.irc_default_nick;
   public int     irc_nick_length = CONST.irc_max_nick_length;
-  public String  irc_user   = this.irc_tolower_(CONST.irc_default_nick);
+  public String  irc_user   = CONST.irc_default_nick;
   public String  irc_info   = CONST.irc_default_info;
   public String  irc_quit   = CONST.irc_default_quit;
   //
-  public String irc_nick_old  = null;
-  public String irc_nick_base = null;
-  public String irc_nick_try  = "";
-  public String irc_layer_mode = CONST.irc_layer_modes[0];
+  public String  irc_nick_old  = null;
+  public String  irc_nick_base = null;
+  public String  irc_nick_try  = "";
+  public String  irc_layer_mode = CONST.irc_layer_modes[0];
+  //
+  public Object  irc_task = null;
+  //
+  public Object  ident_task = null;
+  public boolean ident_run  = false;
+  public String  ident_ip   = CONST.ident_default_ip;
+  public int     ident_port = CONST.ident_default_port;
+  //
+  public ArrayBlockingQueue<Triplet<String, Integer, Integer>>[] irc_queue;
+  //
+  public boolean[] irc_queue_lock = new boolean[] { false, false };
   //
   public int join_retry = 0;
   //
@@ -565,10 +580,19 @@ public class jlayerirc {
     this.irc_server = CONST.irc_default_server;
     this.irc_port = CONST.irc_default_port;
     this.irc_nick = CONST.irc_default_nick;
-    this.irc_ssl  = CONST.irc_default_ssl;
+    this.irc_user = this.irc_tolower_(CONST.irc_default_nick);
+    this.irc_ssl = CONST.irc_default_ssl;
     this.irc_ident = CONST.irc_default_ident;
     //
-    this.irc_run  = false;
+    this.irc_run = false;
+    //
+    ArrayBlockingQueue<Triplet<String, Integer, Integer>>
+      my_queue_input = new ArrayBlockingQueue<Triplet<String, Integer, Integer>>
+        (CONST.irc_queue_size);
+    //
+    ArrayBlockingQueue<Triplet<String, Integer, Integer>>
+      my_queue_output = new ArrayBlockingQueue<Triplet<String, Integer, Integer>>
+        (CONST.irc_queue_size);
     //
     this.irc_layer_mode = CONST.irc_layer_modes[0];
     //
