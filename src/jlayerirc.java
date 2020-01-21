@@ -29,7 +29,11 @@ import java.net.UnknownHostException;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.lang.Thread;
+import org.json.simple.parser.JSONParser;
+// import org.json.simple.parser.ParseException;
+import org.javatuples.Pair;
 import org.javatuples.Triplet;
+import org.javatuples.Septet;
 
 @SuppressWarnings("unchecked")
 
@@ -553,6 +557,8 @@ public class jlayerirc {
   public String  irc_nick_try  = "";
   public String  irc_layer_mode = CONST.irc_layer_modes[0];
   //
+  public int     irc_status = 0;
+  public int     irc_recon = 1;
   public Object  irc_task = null;
   //
   public Object  ident_task = null;
@@ -876,8 +882,102 @@ public class jlayerirc {
     };
     return Triplet.with(in_ret, in_init, in_wait);
   };
+  // End of multi_function_()
 
   // incomplete
+  public String irc_cfg_check_user_(String in_from, String in_channel,
+    Septet<String, String, String, String, String, String, String> in_parameters) {
+
+    return null;
+  };
+
+  // incomplete
+  public String irc_get_unique_temporal_vuid_(String in_mask) {
+
+    return null;
+  };
+
+  // incomplete
+  public String irc_get_vuid_by_mask_(String in_mask, String in_channel) {
+
+    return null;
+  };
+
+  // incomplete
+  public String irc_get_vuid_type_(String in_vuid) {
+
+    return null;
+  };
+
+  // incomplete
+  public boolean is_json_(String in_message) {
+    Object my_json_obj = (Object) null;
+    JSONParser my_parser = new JSONParser();
+    // try {
+    //  my_json_obj = my_parser.parse(in_message);
+    // } catch (ParseException my_ex) {
+    //  return false;
+    // };
+    return true;
+  };
+
+  // incomplete
+  public void irc_disconnect_() {
+
+    this.irc_track_clear_anons_();
+    this.irc_track_clear_nicks_();
+
+  };
+  // End of irc_disconnect_()
+
+  // incomplete
+  public void irc_reconnect_() {
+   if (!this.irc_run) return;
+   this.irc_disconnect_();
+   // this.to_log_("Connection closed, reconnecting to IRC"
+   //   + String.format(" (try: %d)", this.irc_recon));
+   // sleep(CONST.irc_first_wait * this.irc_recon)
+   this.irc_recon += 1;
+   if (this.irc_recon > CONST.irc_recon_steps) this.irc_recon = 1;
+  };
+
+  // incomplete
+  public Pair<String, String> irc_extract_nick_mask_(String in_string) {
+
+    return null;
+  };
+
+  // incomplete
+  public String irc_extract_message_(String in_string) {
+
+    return null;
+  };
+
+  public int irc_whois_nick_(String in_nick) {
+    if (!this.is_irc_nick_(in_nick)) return -1;
+    int ret = this.irc_send_(CONST.cmd_WHOIS + " " + in_nick);
+    return ret;
+  };
+
+  public int irc_who_channel_(String in_channel) {
+    if (!this.is_irc_channel_(in_channel)) return -1;
+    int ret = this.irc_send_(CONST.cmd_WHO + " " + in_channel);
+    return ret;
+  };
+
+  // incomplete
+  public Triplet<String, Integer, String> irc_check_queue_(int in_queue_id) {
+
+    return Triplet.with("", CONST.irc_default_wait, CONST.api_vuid_all);
+  };
+  // End of irc_check_queue_()
+
+  // incomplete
+  public void irc_add_to_queue_(int in_queue_id, String in_message,
+    int in_wait, String in_vuid) {
+
+  };
+
   public void init_rfc1459_() {
    init_constants C = jlayerirc.CONST;
    HashMap<String, String> T = new HashMap<String, String>();
