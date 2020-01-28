@@ -57,9 +57,18 @@ public class jlayerirciot {
    //
    private static final long serialVersionUID = 32767;
    //
-   public String irciot_library_version = "0.0.169";
+   public String irciot_library_version = "0.0.170";
    //
-   public String irciot_protocol_version = "0.3.29";
+   public String irciot_protocol_version = "0.3.31";
+   //
+   // IRC-IoT characters:
+   //
+   public String irciot_chars_lower = "abcdefghijklmnopqrstuvwxyz";
+   public String irciot_chars_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+   public String irciot_chars_digit = "0123456789";
+   public String irciot_chars_addon = "-_.";
+   public String irciot_chars_addr_cell = irciot_chars_lower
+     + irciot_chars_upper + irciot_chars_digit + irciot_chars_addon;
    //
    // IRC-IoT TAGs
    //
@@ -403,6 +412,8 @@ public class jlayerirciot {
    public int err_COMP_ZLIB_HEADER    = 301;
    public int err_COMP_ZLIB_INCOMP    = 303;
    public int err_RSA_KEY_FORMAT      = 351;
+   public int err_INVALID_MESSAGE     = 501;
+   public int err_INVALID_ADDRESS     = 503;
    public int err_LDICT_VERIFY_OK     = 811;
    public int err_LDICT_VERIFY_FAIL   = 812;
    //
@@ -432,6 +443,8 @@ public class jlayerirciot {
      put( err_OVERLAP_MISSMATCH,  "Overlapping fragments missmatch" );
      put( err_COMP_ZLIB_HEADER,   "Invalid Zlib header" );
      put( err_COMP_ZLIB_INCOMP,   "Zlib incomplete block" );
+     put( err_INVALID_MESSAGE,    "Invalid IRC-IoT message format" );
+     put( err_INVALID_ADDRESS,    "Invalid IRC-IoT address format" );
      put( err_RSA_KEY_FORMAT,     "Invalid RSA Key format" );
      put( err_LOAD_ZLIB_MODULE,   "Loading Zlib module" );
      put( err_LOAD_BZIP2_MODULE,  "Loading BZIP2 module" );
@@ -669,6 +682,13 @@ public class jlayerirciot {
     return this.crypt_algo;
   };
   // End of irciot_crypto_get_algorithm_()
+
+  // incomplete
+  public boolean is_irciot_address_(String in_address) {
+
+   return true;
+  }
+  // End of is_irciot_address_()
 
   // incomplete
   public Pair<String, Integer> irciot_encap_bigdatum_(JSONArray in_datums, int in_part) {

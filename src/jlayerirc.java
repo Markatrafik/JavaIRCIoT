@@ -45,9 +45,9 @@ public class jlayerirc {
 
   public static final class init_constants {
    //
-   public String irciot_library_version = "0.0.169";
+   public String irciot_library_version = "0.0.170";
    //
-   public String irciot_protocol_version = "0.3.29";
+   public String irciot_protocol_version = "0.3.31";
    //
    private static final long serialVersionUID = 32765;
    //
@@ -185,7 +185,7 @@ public class jlayerirc {
    // "RFC1459", "Undernet", "Unreal", "Bahamut",   "Inspl", "Hybrid",
    // "RusNet",  "Shadow",   "ircu",   "Nefarious", "Rock",  "Synchronet",
    // "solid",   "PieXus",   "ratbox", "Charybdis", "pure",  "Rubl",
-   // "ngl",     "ConfRoom", "pircd",  "JavaIRCIoT"
+   // "ngl",     "ConfRoom", "pircd",  "aspIRCd",   "JavaIRCIoT"
    //
    public int default_mtu = 480;
    //
@@ -653,11 +653,11 @@ public class jlayerirc {
     if (in_string == null || in_string.isEmpty()) return false;
     boolean my_check = true;
     Pattern my_pattern = Pattern.compile(in_pattern);
-    // try {
+    try {
       Matcher my_matcher = my_pattern.matcher(in_string);
       my_check = my_matcher.matches();
       if (!my_check) return false;
-    // } catch (PatternSyntaxException my_ex) { return false; };
+    } catch (PatternSyntaxException my_ex) { return false; };
     return my_check;
   };
 
@@ -755,6 +755,8 @@ public class jlayerirc {
     } catch (SocketException my_ex) {
       return -1;
     } catch (IOException my_ex) {
+      return -1;
+    } catch (Exception my_ex) {
       return -1;
     };
     return 0;
@@ -941,16 +943,28 @@ public class jlayerirc {
    if (this.irc_recon > CONST.irc_recon_steps) this.irc_recon = 1;
   };
 
-  // incomplete
   public Pair<String, String> irc_extract_nick_mask_(String in_string) {
-
-    return null;
+    String my_mask;
+    String my_nick;
+    try {
+      String[] my_arr = in_string.split(" ");
+      my_mask = my_arr[0].substring(1);
+      my_arr = my_mask.split("!");
+      my_nick = my_arr[0];
+    } catch (Exception my_ex) {
+      my_mask = "!@";
+      my_nick = "";
+    }
+    return Pair.with(my_nick, my_mask);
   };
 
-  // incomplete
   public String irc_extract_message_(String in_string) {
-
-    return null;
+    try {
+      String[] my_arr1 = in_string.split(CONST.cmd_PRIVMSG);
+      String[] my_arr2 = my_arr1[1].split(":");
+      String my_str = my_arr2[1];
+      return my_str.trim();
+    } catch (Exception my_ex) { return null; }
   };
 
   public int irc_whois_nick_(String in_nick) {
