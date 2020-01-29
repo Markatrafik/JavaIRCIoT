@@ -196,12 +196,12 @@ public class jlayerirc {
    public String code_CREATED            = "003";
    public String code_MYINFO             = "004";
    public String code_FEATURELIST        = "005"; // Unknown
-   public String code_MAP                = irc_draft == "Undernet" ? "005" : null;
-   public String code_MAPMORE            = irc_draft == "Undernet" ? "006" : null;
-   public String code_MAPEND             = irc_draft == "Undernet" ? "007" : null;
-   public String code_SNOMASK            = irc_draft == "Undernet" ? "008" : null;
-   public String code_STATMEMTOT         = irc_draft == "Undernet" ? "009" : null;
-   public String code_STATMEM            = irc_draft == "Undernet" ? "010" : null;
+   public String code_MAP                = irc_draft.equals("Undernet") ? "005" : null;
+   public String code_MAPMORE            = irc_draft.equals("Undernet") ? "006" : null;
+   public String code_MAPEND             = irc_draft.equals("Undernet") ? "007" : null;
+   public String code_SNOMASK            = irc_draft.equals("Undernet") ? "008" : null;
+   public String code_STATMEMTOT         = irc_draft.equals("Undernet") ? "009" : null;
+   public String code_STATMEM            = irc_draft.equals("Undernet") ? "010" : null;
    public String code_TRACELINK          = "200";
    public String code_TRACECONNECTING    = "201";
    public String code_TRACEHANDSHAKE     = "202";
@@ -222,13 +222,13 @@ public class jlayerirc {
    public String code_STATSQLINE         = "217";
    public String code_STATSYLINE         = "218";
    public String code_ENDOFSTATS         = "219";
-   public String code_STATSBLINE         = irc_draft == "Unreal"   ? "220" : null;
+   public String code_STATSBLINE         = irc_draft.equals("Unreal") ? "220" : null;
    public String code_UMODEIS            = "221";
-   public String code_SQLINE_NICK        = irc_draft == "Unreal"   ? "222" : null;
-   public String code_STATSGLINE         = irc_draft == "Unreal"   ? "223" : null;
-   public String code_STATSTLINE         = irc_draft == "Unreal"   ? "224" : null;
-   public String code_STATSELINE         = irc_draft == "Unreal"   ? "225" : null;
-   public String code_STATSVLINE         = irc_draft == "Unreal"   ? "227" : null;
+   public String code_SQLINE_NICK        = irc_draft.equals("Unreal") ? "222" : null;
+   public String code_STATSGLINE         = irc_draft.equals("Unreal") ? "223" : null;
+   public String code_STATSTLINE         = irc_draft.equals("Unreal") ? "224" : null;
+   public String code_STATSELINE         = irc_draft.equals("Unreal") ? "225" : null;
+   public String code_STATSVLINE         = irc_draft.equals("Unreal") ? "227" : null;
    public String code_SERVICEINFO        = "231";
    public String code_ENDOFSERVICES      = "232";
    public String code_SERVICE            = "233";
@@ -239,8 +239,8 @@ public class jlayerirc {
    public String code_STATSOLINE         = "243";
    public String code_STATSHLINE         = "244";
    public String code_STATSSLINE         = "245"; // Unknown
-   public String code_STATSXLINE         = irc_draft == "Unreal"   ? "247" : null;
-   public String code_STATSULINE         = irc_draft == "Undernet" ? "248" : null;
+   public String code_STATSXLINE         = irc_draft.equals("Unreal")   ? "247" : null;
+   public String code_STATSULINE         = irc_draft.equals("Undernet") ? "248" : null;
    public String code_STATSDEBUG         = "249"; // Unknown
    public String code_LUSERCONNS         = "250";
    public String code_LUSERCLIENT        = "251";
@@ -257,27 +257,27 @@ public class jlayerirc {
    public String code_TRYAGAIN           = "263";
    public String code_N_LOCAL            = "265";
    public String code_N_GLOBAL           = "266";
-   public String code_SILELIST           = irc_draft == "Undernet" ? "271" : null;
-   public String code_ENDOFSILELIST      = irc_draft == "Undernet" ? "272" : null;
-   public String code_STATUSDLINE        = irc_draft == "Undernet" ? "275" : null;
-   public String code_GLIST              = irc_draft == "Undernet" ? "280" : null;
-   public String code_ENDOFGLIST         = irc_draft == "Undernet" ? "281" : null;
-   public String code_HELPHDR            = irc_draft == "Unreal"   ? "290" : null;
-   public String code_HELPOP             = irc_draft == "Unreal"   ? "291" : null;
-   public String code_HELPTLR            = irc_draft == "Unreal"   ? "292" : null;
-   public String code_HELPHLP            = irc_draft == "Unreal"   ? "293" : null;
-   public String code_HELPFWD            = irc_draft == "Unreal"   ? "294" : null;
-   public String code_HELPIGN            = irc_draft == "Unreal"   ? "295" : null;
+   public String code_SILELIST           = irc_draft.equals("Undernet") ? "271" : null;
+   public String code_ENDOFSILELIST      = irc_draft.equals("Undernet") ? "272" : null;
+   public String code_STATUSDLINE        = irc_draft.equals("Undernet") ? "275" : null;
+   public String code_GLIST              = irc_draft.equals("Undernet") ? "280" : null;
+   public String code_ENDOFGLIST         = irc_draft.equals("Undernet") ? "281" : null;
+   public String code_HELPHDR            = irc_draft.equals("Unreal")   ? "290" : null;
+   public String code_HELPOP             = irc_draft.equals("Unreal")   ? "291" : null;
+   public String code_HELPTLR            = irc_draft.equals("Unreal")   ? "292" : null;
+   public String code_HELPHLP            = irc_draft.equals("Unreal")   ? "293" : null;
+   public String code_HELPFWD            = irc_draft.equals("Unreal")   ? "294" : null;
+   public String code_HELPIGN            = irc_draft.equals("Unreal")   ? "295" : null;
    public String code_NONE               = "300";
    public String code_AWAY               = "301";
    public String code_USERHOST           = "302";
    public String code_ISON               = "303";
-   public String code_RPL_TEXT           = irc_draft == "Bahamut"  ? "304" : null;
+   public String code_RPL_TEXT           = irc_draft.equals("Bahamut")  ? "304" : null;
    public String code_UNAWAY             = "305";
    public String code_NOAWAY             = "306";
-   public String code_USERIP             = irc_draft == "Undernet" ? "307" : null;
-   public String code_RULESSTART         = irc_draft == "Unreal"   ? "308" : null;
-   public String code_ENDOFRULES         = irc_draft == "Unreal"   ? "309" : null;
+   public String code_USERIP             = irc_draft.equals("Undernet") ? "307" : null;
+   public String code_RULESSTART         = irc_draft.equals("Unreal")   ? "308" : null;
+   public String code_ENDOFRULES         = irc_draft.equals("Unreal")   ? "309" : null;
    public String code_WHOISHELP          = "310"; // Unknown
    public String code_WHOISUSER          = "311";
    public String code_WHOISSERVER        = "312";
@@ -297,18 +297,18 @@ public class jlayerirc {
    public String code_NOTOPIC            = "331";
    public String code_CURRENTTOPIC       = "332";
    public String code_TOPICINFO          = "333";
-   public String code_LISTUSAGE          = irc_draft == "Undernet" ? "334" : null;
-   public String code_WHOISBOT           = irc_draft == "Unreal"   ? "335" : null;
+   public String code_LISTUSAGE          = irc_draft.equals("Undernet") ? "334" : null;
+   public String code_WHOISBOT           = irc_draft.equals("Unreal")   ? "335" : null;
    public String code_INVITING           = "341";
    public String code_SUMMONING          = "342";
-   public String code_INVITELIST         = irc_draft == "Unreal"   ? "346" : null;
-   public String code_ENDOFINVITELIST    = irc_draft == "Unreal"   ? "347" : null;
-   public String code_EXCEPTLIST         = irc_draft == "Unreal"   ? "348" : null;
-   public String code_ENDOFEXCEPTLIST    = irc_draft == "Unreal"   ? "349" : null;
+   public String code_INVITELIST         = irc_draft.equals("Unreal") ? "346" : null;
+   public String code_ENDOFINVITELIST    = irc_draft.equals("Unreal")   ? "347" : null;
+   public String code_EXCEPTLIST         = irc_draft.equals("Unreal")   ? "348" : null;
+   public String code_ENDOFEXCEPTLIST    = irc_draft.equals("Unreal")   ? "349" : null;
    public String code_VERSION            = "351";
    public String code_WHOREPLY           = "352";
    public String code_NAMREPLY           = "353";
-   public String code_WHOSPCRP1          = irc_draft == "Undernet" ? "354" : null;
+   public String code_WHOSPCRP1          = irc_draft.equals("Undernet") ? "354" : null;
    public String code_KILLDONE           = "361";
    public String code_CLOSING            = "362";
    public String code_CLOSEEND           = "363";
@@ -326,16 +326,16 @@ public class jlayerirc {
    public String code_ENDOFMOTD          = "376";
    public String code_MOTD2              = "377"; // Unknown
    public String code_AUSTMOTD           = "378"; // Unknown
-   public String code_WHOISMODES         = irc_draft == "Unreal"   ? "379" : null;
+   public String code_WHOISMODES         = irc_draft.equals("Unreal") ? "379" : null;
    public String code_YOUREOPER          = "381";
    public String code_REHASHING          = "382";
-   public String code_YOURESERVICE       = irc_draft == "Unreal"   ? "383" : null;
+   public String code_YOURESERVICE       = irc_draft.equals("Unreal") ? "383" : null;
    public String code_MYPORTIS           = "384";
    public String code_NOTOPERANYMORE     = "385"; // Unknown
-   public String code_QLIST              = irc_draft == "Unreal"   ? "386" : null;
-   public String code_ENDOFQLIST         = irc_draft == "Unreal"   ? "387" : null;
-   public String code_ALIST              = irc_draft == "Unreal"   ? "388" : null;
-   public String code_ENDOFALIST         = irc_draft == "Unreal"   ? "389" : null;
+   public String code_QLIST              = irc_draft.equals("Unreal") ? "386" : null;
+   public String code_ENDOFQLIST         = irc_draft.equals("Unreal") ? "387" : null;
+   public String code_ALIST              = irc_draft.equals("Unreal") ? "388" : null;
+   public String code_ENDOFALIST         = irc_draft.equals("Unreal") ? "389" : null;
    public String code_TIME               = "391";
    public String code_USERSSTART         = "392";
    public String code_USERS              = "393";
@@ -348,40 +348,40 @@ public class jlayerirc {
    public String code_TOOMANYCHANNELS    = "405";
    public String code_WASNOSUCHNICK      = "406";
    public String code_TOOMANYTARGETS     = "407";
-   public String code_NOSUCHSERVICE      = irc_draft == "Unreal"   ? "408" : null;
+   public String code_NOSUCHSERVICE      = irc_draft.equals("Unreal") ? "408" : null;
    public String code_NOORIGIN           = "409";
    public String code_NORECIPIENT        = "411";
    public String code_NOTEXTTOSEND       = "412";
    public String code_NOOPLEVEL          = "413";
    public String code_WILDTOPLEVEL       = "414";
-   public String code_QUERYTOOLONG       = irc_draft == "Undernet" ? "416" : null;
+   public String code_QUERYTOOLONG       = irc_draft.equals("Undernet") ? "416" : null;
    public String code_UNKNOWNCOMMAND     = "421";
    public String code_NOMOTD             = "422";
    public String code_NOADMININFO        = "423";
    public String code_FILEERROR          = "424";
-   public String code_NOOPERMOTD         = irc_draft == "Unreal"   ? "425" : null;
+   public String code_NOOPERMOTD         = irc_draft.equals("Unreal") ? "425" : null;
    public String code_NONICKNAMEGIVEN    = "431";
    public String code_ERRONEUSNICKNAME   = "432";
    public String code_NICKNAMEINUSE      = "433";
-   public String code_NORULES            = irc_draft == "Unreal"   ? "434" : null;
-   public String code_SERVICECONFUSED    = irc_draft == "Unreal"   ? "435" : null;
+   public String code_NORULES            = irc_draft.equals("Unreal") ? "434" : null;
+   public String code_SERVICECONFUSED    = irc_draft.equals("Unreal") ? "435" : null;
    public String code_NICKCOLLISION      = "436";
-   public String code_UNAVAILRESOURCE    = irc_draft != "Undernet" ? "437" : null;
-   public String code_BANNICKCHANGE      = irc_draft == "Undernet" ? "437" : null;
-   public String code_NICKCHANGETOOFAST  = irc_draft == "Undernet" ? "438" : null;
-   public String code_TARGETTOOFAST      = irc_draft == "Undernet" ? "439" : null;
-   public String code_SERVICESDOWN       = irc_draft == "Bahamut"  ? "440" : null;
+   public String code_UNAVAILRESOURCE    = !irc_draft.equals("Undernet") ? "437" : null;
+   public String code_BANNICKCHANGE      = irc_draft.equals("Undernet") ? "437" : null;
+   public String code_NICKCHANGETOOFAST  = irc_draft.equals("Undernet") ? "438" : null;
+   public String code_TARGETTOOFAST      = irc_draft.equals("Undernet") ? "439" : null;
+   public String code_SERVICESDOWN       = irc_draft.equals("Bahamut")  ? "440" : null;
    public String code_USERNOTINCHANNEL   = "441";
    public String code_NOTONCHANNEL       = "442";
    public String code_USERONCHANNEL      = "443";
    public String code_NOLOGIN            = "444";
    public String code_SUMMONDISABLED     = "445";
    public String code_USERSDISABLED      = "446";
-   public String code_NONICKCHANGE       = irc_draft == "Unreal"   ? "447" : null;
+   public String code_NONICKCHANGE       = irc_draft.equals("Unreal")   ? "447" : null;
    public String code_NOTREGISTERED      = "451";
-   public String code_HOSTILENAME        = irc_draft == "Unreal"   ? "455" : null;
-   public String code_NOHIDING           = irc_draft == "Unreal"   ? "459" : null;
-   public String code_NOTFORHALFOPS      = irc_draft == "Unreal"   ? "460" : null;
+   public String code_HOSTILENAME        = irc_draft.equals("Unreal")   ? "455" : null;
+   public String code_NOHIDING           = irc_draft.equals("Unreal")   ? "459" : null;
+   public String code_NOTFORHALFOPS      = irc_draft.equals("Unreal")   ? "460" : null;
    public String code_NEEDMOREPARAMS     = "461";
    public String code_ALREADYREGISTERED  = "462";
    public String code_NOPERMFORHOST      = "463";
@@ -389,133 +389,133 @@ public class jlayerirc {
    public String code_YOUREBANNEDCREEP   = "465";
    public String code_YOUWILLBEBANNED    = "466";
    public String code_KEYSET             = "467";
-   public String code_INVALIDUSERNAME    = irc_draft == "Undernet" ? "468" : null;
-   public String code_LINKSET            = irc_draft == "Unreal"   ? "469" : null;
-   public String code_LINKCHANNEL        = irc_draft == "Unreal"   ? "470" : null;
+   public String code_INVALIDUSERNAME    = irc_draft.equals("Undernet") ? "468" : null;
+   public String code_LINKSET            = irc_draft.equals("Unreal")   ? "469" : null;
+   public String code_LINKCHANNEL        = irc_draft.equals("Unreal")   ? "470" : null;
    public String code_CHANNELISFULL      = "471";
    public String code_UNKNOWNMODE        = "472";
    public String code_INVITEONLYCHAN     = "473";
    public String code_BANNEDFROMCHAN     = "474";
    public String code_BADCHANNELKEY      = "475";
    public String code_BADCHANNELMASK     = "476";
-   public String code_NOCHANMODES        = irc_draft != "Bahamut"  ? "477" : null;
-   public String code_NEEDREGGEDNICK     = irc_draft == "Bahamut"  ? "477" : null;
+   public String code_NOCHANMODES        = !irc_draft.equals("Bahamut") ? "477" : null;
+   public String code_NEEDREGGEDNICK     = irc_draft.equals("Bahamut")  ? "477" : null;
    public String code_BANLISTFULL        = "478";
-   public String code_SECUREONLYCHANNEL  = irc_draft == "pircd"    ? "479" : null;
-   public String code_LINKFULL           = irc_draft == "Unreal"   ? "479" : null;
-   public String code_CANNOTKNOCK        = irc_draft == "Unreal"   ? "480" : null;
+   public String code_SECUREONLYCHANNEL  = irc_draft.equals("pircd")    ? "479" : null;
+   public String code_LINKFULL           = irc_draft.equals("Unreal")   ? "479" : null;
+   public String code_CANNOTKNOCK        = irc_draft.equals("Unreal")   ? "480" : null;
    public String code_NOPRIVILEGES       = "481";
    public String code_CHANOPRIVSNEEDED   = "482";
    public String code_CANTKILLSERVER     = "483";
-   public String code_RESTRICTED         = irc_draft != "Undernet" ? "484" : null;
-   public String code_ISCHANSERVICE      = irc_draft == "Undernet" ? "484" : null;
-   public String code_UNIQOPPRIVSNEEDED  = irc_draft != "Unreal"   ? "485" : null;
-   public String code_KILLDENY           = irc_draft == "Unreal"   ? "485" : null;
-   public String code_HTMDISABLED        = irc_draft == "Unreal"   ? "486" : null;
-   public String code_SECUREONLYCHAN     = irc_draft == "Unreal"   ? "489" : null;
+   public String code_RESTRICTED         = !irc_draft.equals("Undernet") ? "484" : null;
+   public String code_ISCHANSERVICE      = irc_draft.equals("Undernet") ? "484" : null;
+   public String code_UNIQOPPRIVSNEEDED  = irc_draft.equals("Unreal")   ? "485" : null;
+   public String code_KILLDENY           = irc_draft.equals("Unreal")   ? "485" : null;
+   public String code_HTMDISABLED        = irc_draft.equals("Unreal")   ? "486" : null;
+   public String code_SECUREONLYCHAN     = irc_draft.equals("Unreal")   ? "489" : null;
    public String code_NOOPERHOST         = "491";
    public String code_NOSERVICEHOST      = "492";
    public String code_UMODEUNKNOWNFLAG   = "501";
    public String code_USERSDONTMATCH     = "502";
-   public String code_SILELISTFULL       = irc_draft == "Undernet" ? "511" : null;
+   public String code_SILELISTFULL       = irc_draft.equals("Undernet") ? "511" : null;
    public String code_TOOMANYWATCH       = "512"; // Unknown
-   public String code_NOSUCHGLINE        = irc_draft == "Undernet" ? "513" : null;
-   public String code_BADPING            = irc_draft != "Undernet" ? "513" : null;
-   public String code_NOINVITE           = irc_draft == "Unreal"   ? "518" : null;
-   public String code_ADMONLY            = irc_draft == "Unreal"   ? "519" : null;
-   public String code_OPERONLY           = irc_draft == "Unreal"   ? "520" : null;
-   public String code_LISTSYTAX          = irc_draft == "Unreal"   ? "521" : null;
-   public String code_OPERSPVERIFY       = irc_draft == "Unreal"   ? "524" : null;
-   public String code_RPL_LOGON          = irc_draft == "Unreal"   ? "600" : null;
-   public String code_RPL_LOGOFF         = irc_draft == "Unreal"   ? "601" : null;
-   public String code_RPL_WATCHOFF       = irc_draft == "Unreal"   ? "602" : null;
-   public String code_RPL_WATCHSTAT      = irc_draft == "Unreal"   ? "603" : null;
-   public String code_RPL_NOWON          = irc_draft == "Bahamut"  ? "604" : null;
-   public String code_RPL_NOWOFF         = irc_draft == "Bahamut"  ? "605" : null;
-   public String code_RPL_WATCHLIST      = irc_draft == "Unreal"   ? "606" : null;
-   public String code_RPL_ENDOFWATCHLIST = irc_draft == "Unreal"   ? "607" : null;
-   public String code_RPL_DUMPING        = irc_draft == "Unreal"   ? "640" : null;
-   public String code_RPL_DUMPRPL        = irc_draft == "Unreal"   ? "641" : null;
-   public String code_RPL_EODUMP         = irc_draft == "Unreal"   ? "642" : null;
-   public String code_NUMERICERROR       = irc_draft == "Bahamut"  ? "999" : null;
+   public String code_NOSUCHGLINE        = irc_draft.equals("Undernet") ? "513" : null;
+   public String code_BADPING            = !irc_draft.equals("Undernet") ? "513" : null;
+   public String code_NOINVITE           = irc_draft.equals("Unreal")   ? "518" : null;
+   public String code_ADMONLY            = irc_draft.equals("Unreal")   ? "519" : null;
+   public String code_OPERONLY           = irc_draft.equals("Unreal")   ? "520" : null;
+   public String code_LISTSYTAX          = irc_draft.equals("Unreal")   ? "521" : null;
+   public String code_OPERSPVERIFY       = irc_draft.equals("Unreal")   ? "524" : null;
+   public String code_RPL_LOGON          = irc_draft.equals("Unreal")   ? "600" : null;
+   public String code_RPL_LOGOFF         = irc_draft.equals("Unreal")   ? "601" : null;
+   public String code_RPL_WATCHOFF       = irc_draft.equals("Unreal")   ? "602" : null;
+   public String code_RPL_WATCHSTAT      = irc_draft.equals("Unreal")   ? "603" : null;
+   public String code_RPL_NOWON          = irc_draft.equals("Bahamut")  ? "604" : null;
+   public String code_RPL_NOWOFF         = irc_draft.equals("Bahamut")  ? "605" : null;
+   public String code_RPL_WATCHLIST      = irc_draft.equals("Unreal")   ? "606" : null;
+   public String code_RPL_ENDOFWATCHLIST = irc_draft.equals("Unreal")   ? "607" : null;
+   public String code_RPL_DUMPING        = irc_draft.equals("Unreal")   ? "640" : null;
+   public String code_RPL_DUMPRPL        = irc_draft.equals("Unreal")   ? "641" : null;
+   public String code_RPL_EODUMP         = irc_draft.equals("Unreal")   ? "642" : null;
+   public String code_NUMERICERROR       = irc_draft.equals("Bahamut")  ? "999" : null;
    //
-   public String cmd_ACCOUNT    = irc_draft == "Undernet" ? "ACCOUNT"   : null;
+   public String cmd_ACCOUNT    = irc_draft.equals("Undernet") ? "ACCOUNT"   : null;
    public String cmd_ADMIN      = "ADMIN";
    public String cmd_AWAY       = "AWAY";
-   public String cmd_CLARMODE   = irc_draft == "Undernet" ? "CLEARMODE" : null;
-   public String cmd_CLOSE      = irc_draft == "Undernet" ? "CLOSE"     : null;
-   public String cmd_CNOTICE    = irc_draft == "Undernet" ? "CNOTICE"   : null;
-   public String cmd_CONNECT    = irc_draft == "Undernet" ? "CONNECT"   : null;
-   public String cmd_CPRIVMSG   = irc_draft == "Undernet" ? "CPRIVMSG"  : null;
-   public String cmd_CREATE     = irc_draft == "Undernet" ? "CREATE"    : null;
+   public String cmd_CLARMODE   = irc_draft.equals("Undernet") ? "CLEARMODE" : null;
+   public String cmd_CLOSE      = irc_draft.equals("Undernet") ? "CLOSE"     : null;
+   public String cmd_CNOTICE    = irc_draft.equals("Undernet") ? "CNOTICE"   : null;
+   public String cmd_CONNECT    = irc_draft.equals("Undernet") ? "CONNECT"   : null;
+   public String cmd_CPRIVMSG   = irc_draft.equals("Undernet") ? "CPRIVMSG"  : null;
+   public String cmd_CREATE     = irc_draft.equals("Undernet") ? "CREATE"    : null;
    public String cmd_CTCP       = "CTCP";
    public String cmd_CTCPREPLY  = "CTCPREPLY";
-   public String cmd_DESTRUCT   = irc_draft == "Undernet" ? "DESCTRUCT" : null;
-   public String cmd_DESYNCH    = irc_draft == "Undernet" ? "DESYNCH"   : null;
+   public String cmd_DESTRUCT   = irc_draft.equals("Undernet") ? "DESCTRUCT" : null;
+   public String cmd_DESYNCH    = irc_draft.equals("Undernet") ? "DESYNCH"   : null;
    public String cmd_DCC_CON    = "DCC_CONNECT";
    public String cmd_DCC_DISCON = "DCC_DISCONNECT";
    public String cmd_DCC_MSG    = "DCCMSG";
-   public String cmd_DIE        = irc_draft == "Undernet" ? "DIE"       : null;
+   public String cmd_DIE        = irc_draft.equals("Undernet") ? "DIE"       : null;
    public String cmd_DISCONNECT = "DISCONNECT";
    public String cmd_ERROR      = "ERROR";
-   public String cmd_GLINE      = irc_draft == "Undernet" ? "GLINE"     : null;
-   public String cmd_HASH       = irc_draft == "Undernet" ? "HASH"      : null;
-   public String cmd_HELP       = irc_draft == "Undernet" ? "HELP"      : null;
+   public String cmd_GLINE      = irc_draft.equals("Undernet") ? "GLINE"     : null;
+   public String cmd_HASH       = irc_draft.equals("Undernet") ? "HASH"      : null;
+   public String cmd_HELP       = irc_draft.equals("Undernet") ? "HELP"      : null;
    public String cmd_INFO       = "INFO";
    public String cmd_INVITE     = "INVITE";
    public String cmd_ISON       = "ISON";
    public String cmd_JOIN       = "JOIN";
-   public String cmd_JUPE       = irc_draft == "Undernet" ? "JUPE"      : null;
+   public String cmd_JUPE       = irc_draft.equals("Undernet") ? "JUPE"      : null;
    public String cmd_KICK       = "KICK";
    public String cmd_KILL       = "KILL";
    public String cmd_LINKS      = "LINKS";
    public String cmd_LIST       = "LIST";
-   public String cmd_LUSERS     = irc_draft == "Undernet" ? "LUSERS"    : null;
+   public String cmd_LUSERS     = irc_draft.equals("Undernet") ? "LUSERS"    : null;
    public String cmd_MODE       = "MODE";
    public String cmd_MOTD       = "MOTD";
    public String cmd_NAMES      = "NAMES";
-   public String cmd_MAP        = irc_draft == "Undernet" ? "MAP"       : null;
+   public String cmd_MAP        = irc_draft.equals("Undernet") ? "MAP"       : null;
    public String cmd_NICK       = "NICK";
    public String cmd_NOTICE     = "NOTICE";
    public String cmd_NJOIN      = "NJOIN";
    public String cmd_OPER       = "OPER";
-   public String cmd_OPMODE     = irc_draft == "Undernet" ? "OPMODE"    : null;
+   public String cmd_OPMODE     = irc_draft.equals("Undernet") ? "OPMODE"    : null;
    public String cmd_PART       = "PART";
    public String cmd_PASS       = "PASS";
    public String cmd_PING       = "PING";
    public String cmd_PONG       = "PONG";
    public String cmd_PRIVMSG    = "PRIVMSG";
-   public String cmd_PRIVS      = irc_draft == "Undernet" ? "PRIVS"     : null;
+   public String cmd_PRIVS      = irc_draft.equals("Undernet") ? "PRIVS"     : null;
    public String cmd_PRIVNOTICE = "PRIVNOTICE";
-   public String cmd_PROTO      = irc_draft == "Undernet" ? "PROTO"     : null;
+   public String cmd_PROTO      = irc_draft.equals("Undernet") ? "PROTO"     : null;
    public String cmd_PUBMSG     = "PUBMSG";
    public String cmd_PUBNOTICE  = "PUBNOTICE";
    public String cmd_REHASH     = "REHASH";
-   public String cmd_RESET      = irc_draft == "Undernet" ? "RESET"     : null;
+   public String cmd_RESET      = irc_draft.equals("Undernet") ? "RESET"     : null;
    public String cmd_RESTART    = "RESTART";
-   public String cmd_RPING      = irc_draft == "Undernet" ? "RPING"     : null;
-   public String cmd_RPONG      = irc_draft == "Undernet" ? "RPONG"     : null;
+   public String cmd_RPING      = irc_draft.equals("Undernet") ? "RPING"     : null;
+   public String cmd_RPONG      = irc_draft.equals("Undernet") ? "RPONG"     : null;
    public String cmd_QUIT       = "QUIT";
    public String cmd_SERVER     = "SERVER";
-   public String cmd_SET        = irc_draft == "Undernet" ? "SET"       : null;
-   public String cmd_SETTIME    = irc_draft == "Undernet" ? "SETTIME"   : null;
-   public String cmd_SILENCE    = irc_draft == "Undernet" ? "SILENCE"   : null;
+   public String cmd_SET        = irc_draft.equals("Undernet") ? "SET"       : null;
+   public String cmd_SETTIME    = irc_draft.equals("Undernet") ? "SETTIME"   : null;
+   public String cmd_SILENCE    = irc_draft.equals("Undernet") ? "SILENCE"   : null;
    public String cmd_SQUIT      = "SQUIT";
    public String cmd_STATS      = "STATS";
    public String cmd_SUMMON     = "SUMMON";
    public String cmd_TIME       = "TIME";
    public String cmd_TOPIC      = "TOPIC";
    public String cmd_TRACE      = "TRACE";
-   public String cmd_UPING      = irc_draft == "Undernet" ? "UPING"     : null;
+   public String cmd_UPING      = irc_draft.equals("Undernet") ? "UPING"     : null;
    public String cmd_USER       = "USER";
-   public String cmd_USERIP     = irc_draft == "Undernet" ? "USERIP"    : null;
+   public String cmd_USERIP     = irc_draft.equals("Undernet") ? "USERIP"    : null;
    public String cmd_USERS      = "USERS";
    public String cmd_USERHOST   = "USERHOST";
    public String cmd_VERSION    = "VERSION";
-   public String cmd_WALLCHOPS  = irc_draft == "Undernet" ? "WALLCHOPS" : null;
+   public String cmd_WALLCHOPS  = irc_draft.equals("Undernet") ? "WALLCHOPS" : null;
    public String cmd_WALLOPS    = "WALLOPS";
-   public String cmd_WALLUSERS  = irc_draft == "Undernet" ? "WALLUSERS" : null;
-   public String cmd_WALLVOICE  = irc_draft == "Undernet" ? "WALLVOICE" : null;
+   public String cmd_WALLUSERS  = irc_draft.equals("Undernet") ? "WALLUSERS" : null;
+   public String cmd_WALLVOICE  = irc_draft.equals("Undernet") ? "WALLVOICE" : null;
    public String cmd_WHOIS      = "WHOIS";
    public String cmd_WHOWAS     = "WHOWAS";
    public String cmd_WHO        = "WHO";
@@ -533,13 +533,13 @@ public class jlayerirc {
    };
    //
    public init_constants() {
-     if (this.irc_draft == "Undernet") {
+     if (this.irc_draft.equals("Undernet")) {
        this.default_mtu = 450;
        this.irc_max_nick_length = 12;
        this.code_STATSTLINE = "246";
        this.code_STATSGLINE = "247";
      };
-     if (this.irc_draft == "Unreal") {
+     if (this.irc_draft.equals("Unreal")) {
        this.code_STATSNLINE = "226";
        this.code_MAPMORE    = "610";
      };
@@ -621,6 +621,11 @@ public class jlayerirc {
 
   };
 
+  public void finalize() throws Throwable {
+    // Class was destroyed by the Garbage Collector :)
+    // this.stop_IRC_();
+  };
+
   public String irc_translate(String in_str, HashMap<Character, Character> in_map) {
     StringBuilder my_buffer = new StringBuilder(in_str);
     if (in_map == null) return in_str;
@@ -643,6 +648,26 @@ public class jlayerirc {
 
   public String irc_tolower_(String in_input) {
     return this.irc_translate(in_input, CONST.irc_translation);
+  };
+
+  // incomplete
+  public void ident_server_() {
+
+  };
+
+  // incomplete
+  public void start_IRC_() {
+    this.irc_run = true;
+
+  };
+
+  // incomplete
+  public void stop_IRC_() {
+    this.irc_run = false;
+    this.ident_run = false;
+
+    this.irc_disconnect_();
+
   };
 
   // incomplete
@@ -886,7 +911,7 @@ public class jlayerirc {
       case "NAMREPLY":
         try {
           String[] my_arr = in_string.split(":", 3);
-          if (my_arr[0] == "") {
+          if (my_arr[0].isEmpty()) {
             my_arr = my_arr[2].split(" ");
             for (int my_idx = 0;my_idx < my_arr.length;my_idx++) {
               String my_nick = my_arr[my_idx];
@@ -1070,11 +1095,11 @@ public class jlayerirc {
    T.put(C.code_UNKNOWNMODE,      "UNKNOWNMODE");
    T.put(C.code_INVITEONLYCHAN,   "INVITEONLYCHAN");
    T.put(C.code_BADCHANNELMASK,   "BADCHANNELMASK");
-   if (CONST.irc_draft == "Undernet") {
+   if (CONST.irc_draft.equals("Undernet")) {
      T.put(C.code_BANNICKCHANGE,  "BANNICKCHANGE");
      T.put(C.code_USERIP,         "USERIP");
      T.put(C.code_INVALIDUSERNAME,"INVALIDUSERNAME");
-   } else if (CONST.irc_draft == "Unreal") {
+   } else if (CONST.irc_draft.equals("Unreal")) {
      T.put(C.code_NONICKCHANGE,   "NONICKCHANGE");
      T.put(C.code_WHOISBOT,       "WHOISBOT");
      T.put(C.code_NOSUCHSERVICE,  "NOSUCHSERVICE");
@@ -1085,7 +1110,7 @@ public class jlayerirc {
    };
    this.irc_codes = T;
    //
-   if (this.irc_layer_mode == CONST.irc_layer_modes[0]) {
+   if (this.irc_layer_mode.equals(CONST.irc_layer_modes[0])) {
      K.put(C.cmd_PONG,   "CMD:PONG");
      K.put(C.cmd_PRIVMSG,"CMD:PRIVMSG");
      K.put(C.cmd_INVITE, "CMD:INVITE");
