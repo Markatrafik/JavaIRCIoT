@@ -178,6 +178,8 @@ public class jlayerirc {
    public String irc_all_modes = irc_user_modes + irc_channel_modes + irc_extra_modes;
    public String irc_all_modes_chars = irc_change_modes + irc_all_modes;
    //
+   public HashMap<Character, Character> irc_translation;
+   //
    public int irc_max_nick_length = 15;
    //
    public String irc_draft = "Undernet";
@@ -521,6 +523,15 @@ public class jlayerirc {
    public String ident_default_ip   = "127.0.0.1";
    public int    ident_default_port = 113;
    //
+   public HashMap<Character, Character> irc_maketrans(String in_from, String in_to) {
+     HashMap<Character, Character> my_map = new HashMap<Character, Character>();
+     if (in_from.length() != in_to.length()) return null;
+     for (int my_idx = 0;my_idx < in_from.length();my_idx++) {
+       my_map.put(in_from.charAt(my_idx), in_to.charAt(my_idx));
+     };
+     return my_map;
+   };
+   //
    public init_constants() {
      if (this.irc_draft == "Undernet") {
        this.default_mtu = 450;
@@ -532,6 +543,10 @@ public class jlayerirc {
        this.code_STATSNLINE = "226";
        this.code_MAPMORE    = "610";
      };
+     this.irc_translation = this.irc_maketrans(
+       this.irc_ascii_uppercase + "[]\\^",
+       this.irc_ascii_lowercase + "{}|~"
+     );
    };
   };
 
@@ -606,6 +621,18 @@ public class jlayerirc {
 
   };
 
+  public String irc_translate(String in_str, HashMap<Character, Character> in_map) {
+    StringBuilder my_buffer = new StringBuilder(in_str);
+    if (in_map == null) return in_str;
+    for (int my_idx = 0;my_idx < my_buffer.length();my_idx++) {
+      Character my_ch = my_buffer.charAt(my_idx);
+      Character my_rep = in_map.get(my_ch);
+      if (my_rep != null)
+        my_buffer.replace(my_idx, my_idx + 1, "" + my_rep);
+    };
+    return my_buffer.toString();
+  };
+
   public String irciot_protocol_version_() {
     return CONST.irciot_protocol_version;
   };
@@ -614,9 +641,8 @@ public class jlayerirc {
     return CONST.irciot_library_version;
   };
 
-  // incomplete
   public String irc_tolower_(String in_input) {
-    return in_input;
+    return this.irc_translate(in_input, CONST.irc_translation);
   };
 
   // incomplete
@@ -689,15 +715,21 @@ public class jlayerirc {
     return this.is_pattern_(in_channel, my_pattern);
   };
 
-  // incomplete
   public boolean irc_compare_nicks_(String ref_nick, String cmp_nick) {
-
+    if (!this.is_irc_nick_(ref_nick)) return false;
+    if (!this.is_irc_nick_(cmp_nick)) return false;
+    String my_ref_nick = this.irc_tolower_(ref_nick);
+    String my_cmp_nick = this.irc_tolower_(cmp_nick);
+    if (my_ref_nick.equals(my_cmp_nick)) return true;
     return false;
   };
 
-  // incomplete
   public boolean irc_compare_channels_(String ref_channel, String cmp_channel) {
-
+    if (!this.is_irc_channel_(ref_channel)) return false;
+    if (!this.is_irc_channel_(cmp_channel)) return false;
+    String my_ref_channel = this.irc_tolower_(ref_channel);
+    String my_cmp_channel = this.irc_tolower_(cmp_channel);
+    if (my_ref_channel.equals(my_cmp_channel)) return true;
     return false;
   };
 
@@ -911,15 +943,14 @@ public class jlayerirc {
     return null;
   };
 
-  // incomplete
   public boolean is_json_(String in_message) {
     Object my_json_obj = (Object) null;
     JSONParser my_parser = new JSONParser();
-    // try {
-    //  my_json_obj = my_parser.parse(in_message);
-    // } catch (ParseException my_ex) {
-    //  return false;
-    // };
+    try {
+      my_json_obj = my_parser.parse(in_message);
+    } catch (Exception my_ex) {
+      return false;
+    };
     return true;
   };
 
