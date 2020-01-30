@@ -6,10 +6,16 @@ export BINARY_JAVA="/usr/bin/java"
 export BINARY_GREP="/bin/grep"
 export BINARY_AWK="/usr/bin/awk"
 export BINARY_BASENAME="/usr/bin/basename"
+export BINARY_DIRNAME="/usr/bin/dirname"
 export SCRIPT_BUILD="./my_build.sh"
 
+if [ -x "${BINARY_DIRNAME}" ]; then
+ cd "$("${BINARY_DIRNAME}" "${0}" 2>/dev/null)"
+fi
+
 for THE_BINARY in "${BINARY_JAVA}" "${BINARY_BASENAME}" \
- "${BINARY_GREP}" "${BINARY_TR}" "${BINARY_AWK}" "${SCRIPT_BUILD}" ; do
+ "${BINARY_DIRNAME}" "${BINARY_GREP}" "${BINARY_TR}" \
+ "${BINARY_AWK}" "${SCRIPT_BUILD}" ; do
  if [ ! -x "${THE_BINARY}" ]; then
   echo "No executable file: '${THE_BINARY}', exiting... " ; exit 1 ; fi
 done

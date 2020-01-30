@@ -24,6 +24,7 @@ export MAVEN_ARGS="${MAVEN_ARGS} -DdefaultCharacterEncoding=UTF-8"
 #export GRADLE_ARGS="${GRADLE_ARGS} --warning-mode all" # Warnings
 export GRADLE_ARGS="${GRADLE_ARGS} --warning-mode none"
 export BINARY_APT_GET="/usr/bin/apt-get"
+export BINARY_DIRNAME="/usr/bin/dirname"
 export BINARY_JAVAC="/usr/bin/javac"
 export BINARY_DPKG="/usr/bin/dpkg"
 export BINARY_TR="/usr/bin/tr"
@@ -36,6 +37,10 @@ export BINARY_LN="/bin/ln"
 export BINARY_RMDIR="/bin/rmdir"
 export BINARY_MKDIR="/bin/mkdir"
 export BINARY_MVN="/usr/bin/mvn"
+
+if [ -x "${BINARY_DIRNAME}" ]; then
+ cd "$("${BINARY_DIRNAME}" "${0}" 2>/dev/null)"
+fi
 
 if [ "x${1}x" == "xx" ]; then
  echo -ne "Usage: ${0} [ build | maven | gradle | test | clear ]\n\n"

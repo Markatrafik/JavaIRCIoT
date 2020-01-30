@@ -409,7 +409,7 @@ public class jlayerirc {
    public String code_CANTKILLSERVER     = "483";
    public String code_RESTRICTED         = !irc_draft.equals("Undernet") ? "484" : null;
    public String code_ISCHANSERVICE      = irc_draft.equals("Undernet") ? "484" : null;
-   public String code_UNIQOPPRIVSNEEDED  = irc_draft.equals("Unreal")   ? "485" : null;
+   public String code_UNIQOPPRIVSNEEDED  = !irc_draft.equals("Unreal")  ? "485" : null;
    public String code_KILLDENY           = irc_draft.equals("Unreal")   ? "485" : null;
    public String code_HTMDISABLED        = irc_draft.equals("Unreal")   ? "486" : null;
    public String code_SECUREONLYCHAN     = irc_draft.equals("Unreal")   ? "489" : null;

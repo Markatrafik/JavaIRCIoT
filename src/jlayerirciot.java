@@ -30,7 +30,7 @@ import org.javatuples.Ennead;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+// import org.json.simple.parser.ParseException;
 @SuppressWarnings("unchecked")
 
 public class jlayerirciot {
@@ -683,9 +683,27 @@ public class jlayerirciot {
   };
   // End of irciot_crypto_get_algorithm_()
 
-  // incomplete
   public boolean is_irciot_address_(String in_address) {
-
+   if (in_address.isEmpty()) return true;
+   if (in_address.contains("/")) {
+     String[] my_arr = in_address.split("/");
+     for (int my_idx = 0;my_idx < my_arr.length;my_idx++) {
+       String my_cell = my_arr[my_idx];
+       if (!this.is_irciot_address_(my_cell))
+         return false;
+     };
+   } else if (in_address.contains("@")) {
+     String[] my_arr = in_address.split("@");
+     if (my_arr.length != 2) return false;
+     for (int my_part = 0;my_part < 2;my_part++) {
+       String my_str = my_arr[my_part];
+       for (int my_idx = 0;my_idx < my_str.length();my_idx++) {
+         String my_chs = my_str.charAt(my_idx) + "";
+         if (!CONST.irciot_chars_addr_cell.contains(my_chs))
+           return false;
+       };
+     };
+   };
    return true;
   }
   // End of is_irciot_address_()
@@ -707,8 +725,9 @@ public class jlayerirciot {
     try {
       JSONParser my_parser = new JSONParser();
       JSONObject my_datums = (JSONObject) my_parser.parse(in_datumset);
-    } catch (ParseException my_ex) {
-      // my_ex.printStackTrace();
+    // } catch (ParseException my_ex) {
+    } catch (Exception my_ex) {
+      my_ex.printStackTrace();
       return "";
     };
     String my_irciot = "";
@@ -741,8 +760,9 @@ public class jlayerirciot {
     JSONParser my_parser = new JSONParser();
     try {
       my_json_obj = my_parser.parse(my_datumset);
-    } catch (ParseException my_ex) {
-      // my_ex.printStackTrace();
+    // } catch (ParseException my_ex) {
+    } catch (Exception my_ex) {
+      my_ex.printStackTrace();
       return Triplet.with("", 0, 0);
     };
     int my_total = 0;
@@ -767,7 +787,8 @@ public class jlayerirciot {
       my_datumset = my_datums_array.toString();
       try {
         my_datums = (JSONArray) my_parser.parse(my_datumset);
-      } catch (ParseException my_ex) {
+      // } catch (ParseException my_ex) {
+      } catch (Exception my_ex) {
         return Triplet.with("", 0, 0);
       };
     }; // in_skip
@@ -777,8 +798,9 @@ public class jlayerirciot {
         this.current_mid = save_mid; // mid rollback
       try {
         my_json_obj = my_parser.parse(my_datumset);
-      } catch (ParseException my_ex) {
-        // my_ex.printStackTrace();
+      // } catch (ParseException my_ex) {
+      } catch (Exception my_ex) {
+        my_ex.printStackTrace();
         return Triplet.with("", 0, 0);
       };
       int one_datum = 0;
