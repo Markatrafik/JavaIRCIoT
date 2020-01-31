@@ -57,7 +57,7 @@ public class jlayerirciot {
    //
    private static final long serialVersionUID = 32767;
    //
-   public String irciot_library_version = "0.0.170";
+   public String irciot_library_version = "0.0.171";
    //
    public String irciot_protocol_version = "0.3.31";
    //
@@ -479,7 +479,14 @@ public class jlayerirciot {
    public String mod_USERSIGN  = "irciot-usersign";
    public String mod_USERCRYPT = "irciot-usercrypt";
    //
-   public int crc16_start = 0xA001; // CRC-16-IBM
+   public int crc16_poly = 0xA001;
+   // public boolean crc16_reversed = false;
+   // 0xA001 -- x^16 + x^15 + x^2 + 1 (CRC-16-IBM)
+   // 0xC002 -- x^16 + x^14 + x   + 1 (CRC-16-IBM reversed)
+   // 0x8408 -- x^16 + x^12 + x^5 + 1 (CRC-16-CCITT) SDLC/HDLC
+   // 0x8810 -- x^16 + x^11 + x^4 + 1 (CRC-16-CCITT reversed)
+   // 0x8000 -- x^16 + 1 (LRCC-16)
+   // 0x8005
    //
    public int virtual_mid_pipeline_size = 16;
    //
@@ -545,6 +552,8 @@ public class jlayerirciot {
   //
   public int integrity_check = CONST.default_integrity_check;
   //
+  public short[] crc16_table;
+  //
   public jlayerirciot() { // Class constructor
     //
 
@@ -563,9 +572,22 @@ public class jlayerirciot {
   };
   //
 
-  // incomplete
   public void irciot_crc16_init_() {
-
+    int my_poly = CONST.crc16_poly;
+    short[] my_table = new short[256];
+    int my_item = 0;
+    for (int my_idx1 = 0;my_idx1 < 256;my_idx1++) {
+      my_item = (short) (my_idx1 & 0xFFFF);
+      for (int my_idx2 = 0;my_idx2 < 8;my_idx2++) {
+        int my_tmp = my_item >> 1;
+        if ((my_item & 0x0001) != 0) {
+          my_item = my_tmp ^ (my_poly & 0xFFFF);
+        } else
+          my_item = my_tmp;
+      };
+      my_table[my_idx1] = (short) (my_item & 0xFFFF);
+    };
+    this.crc16_table = my_table;
   };
 
   // incomplete
@@ -573,29 +595,20 @@ public class jlayerirciot {
 
   };
 
-  // incomplete
   public String irciot_crc16_(byte[] in_bytes) {
-    // if this.crc16_table_
-    //   this.irciot_crc16_init_()
-    int my_crc = 0xFFFF;
-    int my_poly = CONST.crc16_start;
-    for (byte _b : in_bytes) {
-      int _tmp = (my_crc ^ _b) & 0xFF;
-      for (int _i = 0;_i < 8;_i++) {
-        if ((_tmp & 1) != 0)
-         _tmp = (_tmp >> 1) ^ my_poly;
-        else _tmp = (_tmp >> 1);
-      }
-    };
-    return Integer.toHexString(my_crc);
+    if (this.crc16_table == null) this.irciot_crc16_init_();
+    int my_crc = 0x0000;
+    for (byte my_chr : in_bytes)
+      my_crc = ((my_crc >> 8) ^ (this.crc16_table[((my_crc ^ my_chr) & 0xFF)]) & 0xFFFF);
+    return String.format("%04x", my_crc & 0xFFFF);
   }
-  //
+
+  //incomplete
   public String irciot_crc32_(byte[] in_bytes) {
-    // if this.crc32_table_
-    //   this.irciot_crc16_init_()
+    // if (this.crc32_table == null) this.irciot_crc32_init_();
     Checksum my_crc = new CRC32();
     my_crc.update(in_bytes, 0, in_bytes.length);
-    return String.format("%08X", my_crc.getValue());
+    return String.format("%08x", my_crc.getValue());
   };
 
   // incomplete

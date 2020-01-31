@@ -4,6 +4,7 @@
 
 import java.lang.*;
 import javairciot.*;
+import java.nio.charset.Charset;
 
 class test_javairciot extends javairciot.jlayerirciot {
 
@@ -27,13 +28,33 @@ class test_javairciot extends javairciot.jlayerirciot {
       System.out.print("Test is_irciot_address_(\"" + my_str + "\") = ");
       System.out.println(my_irciot.is_irciot_address_(my_str));
     };
+
+    String my_password = "MY_password-inside-stringxxx@";
+    System.out.println("");
+    byte[] my_bytes = my_password.getBytes(Charset.forName("UTF-8"));
+    my_irciot.irciot_crc16_init_();
+    String my_crc16 = my_irciot.irciot_crc16_(my_bytes);
+    String my_addon = null;
+    Integer my_len = 0;
+    if (my_crc16 != null) {
+      System.out.print("Test irciot_crc_16_('" + my_password);
+      System.out.print("') = 0x" + my_crc16);
+      if (my_crc16.equals("5c66")) System.out.println(" -- OK");
+      else System.out.println(" -- FAILED");
+    } else System.out.println(" <null> -- FAILED");
+    String my_crc32 = my_irciot.irciot_crc32_(my_bytes);
+    if (my_crc32 != null) {
+      System.out.print("Test irciot_crc_32_('" + my_password);
+      System.out.print("') = 0x" + my_crc32);
+      if (my_crc32.equals("4d595f70")) System.out.println(" -- OK");
+      else System.out.println(" -- FAILED");
+    } else System.out.println(" <null> -- FAILED");
   };
 
   public static void main(String args[]) {
     irc_testing();
     irc_checks();
   };
-
 
 }
 
