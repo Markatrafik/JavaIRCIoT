@@ -632,6 +632,7 @@ public class jlayerirciot {
 
     return "";
   };
+  // End of irciot_defragmentation_()
 
   public String irciot_decrypt_datum_(JSONObject in_datum,
     Sextet<String, String, String, String, Integer, Integer> in_header,
@@ -671,6 +672,59 @@ public class jlayerirciot {
     my_enc = in_datum.get(CONST.tag_ENC_DATUM).toString();
     return this.irciot_defragmentation_(my_enc, my_header, orig_json, in_vuid);
   };
+  // End of irciot_decrypt_datum_()
+
+  public String irciot_prepare_datum_(JSONObject in_datum,
+  Sextet<String, String, String, String, Integer, Integer> in_header,
+  String orig_json, String in_vuid) {
+    JSONObject my_datum = in_datum;
+    if (!in_datum.containsKey(CONST.tag_ENC_DATUM)) {
+      String my_dt = in_header.getValue0();
+      String my_ot = in_header.getValue1();
+      String my_src = in_header.getValue2();
+      String my_dst = in_header.getValue3();
+      int my_dc = in_header.getValue4();
+      int my_dp = in_header.getValue5();
+      if (!in_datum.containsKey(CONST.tag_DATE_TIME))
+        my_datum.put(CONST.tag_DATE_TIME, my_dt);
+      if (!in_datum.containsKey(CONST.tag_OBJECT_TYPE))
+        my_datum.put(CONST.tag_OBJECT_TYPE, my_ot);
+      if (!in_datum.containsKey(CONST.tag_SRC_ADDR))
+        my_datum.put(CONST.tag_SRC_ADDR, my_src);
+      if (!in_datum.containsKey(CONST.tag_DST_ADDR))
+        my_datum.put(CONST.tag_DST_ADDR, my_dst);
+      try {
+        my_dt = my_datum.get(CONST.tag_DATE_TIME).toString();
+      } catch (Exception my_ex) { my_dt = null; };
+      if (my_dt == null) try {
+        my_datum.remove(CONST.tag_DATE_TIME);
+      } catch (Exception my_ex) {};
+     } else return this.irciot_decrypt_datum_(in_datum, in_header,
+         orig_json, in_vuid);
+    return my_datum.toString();
+  };
+  // End of irciot_prepare_datum_()
+
+  // incomplete
+  public void irciot_check_datum_(JSONObject in_datum,
+    String in_vuid, String in_ot) {
+    if (in_vuid == null) return;
+    if (!in_datum.containsKey(CONST.tag_DATUM_ID)) return;
+    if (!in_datum.containsKey(CONST.tag_DATE_TIME)) return;
+    if ((in_ot == CONST.ot_BCH_INFO) ||
+        (in_ot == CONST.ot_BCH_ACK)) {
+
+    } else if (in_ot == CONST.ot_BCH_REQUEST) {
+
+    } else if ((in_ot == CONST.ot_ENC_INFO) ||
+        (in_ot == CONST.ot_ENC_ACK)) {
+
+    } else if (in_ot == CONST.ot_ENC_REQUEST) {
+
+    };
+  };
+  // End of irciot_check_datum_()
+
   //
 
   //
@@ -748,6 +802,13 @@ public class jlayerirciot {
     return this.crypt_algo;
   };
   // End of irciot_crypto_get_algorithm_()
+
+  // incomplete
+  public void irciot_blockchain_key_publication_(String in_public_key,
+    String in_ot, String in_vuid) {
+
+  };
+  // End of irciot_blockchain_key_publication_()
 
   public boolean is_irciot_address_(String in_address) {
    if (in_address.isEmpty()) return true;
