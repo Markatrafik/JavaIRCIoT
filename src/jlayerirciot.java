@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import org.javatuples.Pair;
+import org.javatuples.Sextet;
 import org.javatuples.Triplet;
 import org.javatuples.Ennead;
 import org.json.simple.JSONArray;
@@ -341,6 +342,8 @@ public class jlayerirciot {
    //
    public String api_vuid_RoS  = "sr"; // Primary Routing Service
    //
+   // IRC-IoT Base Types
+   //
    public int type_UNDEFINED =  0;
    public int type_NUMERIC   = 10;
    public int type_FLOAT     = 11;
@@ -491,10 +494,11 @@ public class jlayerirciot {
    public int virtual_mid_pipeline_size = 16;
    //
    public int default_integrity_check = 0;
+   public int default_integrity_stamp = 0;
    //
    // 0 is No Integrity Check
    // 1 is CRC16 Check "c1": +12 bytes
-   // 2 is CRC32 Check "c2": +14 bytes
+   // 2 is CRC32 Check "c2": +16 bytes
    //
    public init_constants() {
      if (jlayerirciot.CAN_compress_datum) {
@@ -590,9 +594,7 @@ public class jlayerirciot {
     this.crc16_table = my_table;
   };
 
-  // incomplete
   public void irciot_crc32_init_() {
-
   };
 
   public String irciot_crc16_(byte[] in_bytes) {
@@ -603,9 +605,7 @@ public class jlayerirciot {
     return String.format("%04x", my_crc & 0xFFFF);
   }
 
-  //incomplete
   public String irciot_crc32_(byte[] in_bytes) {
-    // if (this.crc32_table == null) this.irciot_crc32_init_();
     Checksum my_crc = new CRC32();
     my_crc.update(in_bytes, 0, in_bytes.length);
     return String.format("%08x", my_crc.getValue());
@@ -614,9 +614,62 @@ public class jlayerirciot {
   // incomplete
   public String irciot_defragmentation_(String in_enc,
     Ennead<String, String, String, String, Integer, Integer, Integer, Integer, Integer> in_header,
-    String orig_json) {
+    String orig_json, String in_vuid) {
+    String my_dt = in_header.getValue0();
+    String my_ot = in_header.getValue1();
+    String my_src = in_header.getValue2();
+    String my_dst = in_header.getValue3();
+    int my_dc = in_header.getValue4();
+    int my_dp = in_header.getValue5();
+    int my_bc = in_header.getValue6();
+    int my_bp = in_header.getValue7();
+    int my_did = in_header.getValue8();
+    boolean my_dup = false;
+    boolean my_new = false;
+    int my_err = 0;
+    int my_ok  = 0;
+    boolean my_fragments = false;
 
     return "";
+  };
+
+  public String irciot_decrypt_datum_(JSONObject in_datum,
+    Sextet<String, String, String, String, Integer, Integer> in_header,
+    String orig_json, String in_vuid) {
+    Ennead<String, String, String, String, Integer, Integer,
+      Integer, Integer, Integer> my_header;
+    String my_dt = in_header.getValue0();
+    String my_ot = in_header.getValue1();
+    String my_src = in_header.getValue2();
+    String my_dst = in_header.getValue3();
+    String my_em = CONST.tag_ENC_BASE64;
+    String my_enc = null;
+    int my_dc = in_header.getValue4();
+    int my_dp = in_header.getValue5();
+    int my_bc = -1;
+    int my_bp = -1;
+    int my_did = -1;
+    if (!in_datum.containsKey(CONST.tag_ENC_DATUM)) return "";
+    if (in_datum.containsKey(CONST.tag_DATUM_BC))
+      try {
+        my_bc = Integer.parseInt(in_datum.get(CONST.tag_DATUM_BC).toString());
+      } catch (Exception my_ex) {};
+    if (in_datum.containsKey(CONST.tag_DATUM_BP))
+      try {
+        my_bp = Integer.parseInt(in_datum.get(CONST.tag_DATUM_BP).toString());
+      } catch (Exception my_ex) {};
+    if (in_datum.containsKey(CONST.tag_DATUM_ID))
+      try {
+        my_did = Integer.parseInt(in_datum.get(CONST.tag_DATUM_ID).toString());
+      } catch (Exception my_ex) {};
+    if (in_datum.containsKey(CONST.tag_ENC_METHOD))
+      try {
+        my_em = in_datum.get(CONST.tag_ENC_METHOD).toString();
+      } catch (Exception my_ex) {};
+    my_header = Ennead.with(my_dt, my_ot, my_src, my_dst,
+      my_dc, my_dp, my_bc, my_bp, my_did);
+    my_enc = in_datum.get(CONST.tag_ENC_DATUM).toString();
+    return this.irciot_defragmentation_(my_enc, my_header, orig_json, in_vuid);
   };
   //
 
