@@ -22,11 +22,17 @@ class test_javairciot extends javairciot.jlayerirciot {
     String[] my_addresses = new String[] { "", "Hello@World",
       "server@location1/device@location2", "@location1/device",
       "t@t", "wekfj24er24'f,f4ef_ ed'e2@@@@" };
+    boolean[] my_results = new boolean[] { true, true,
+      true, true, true, false };
     System.out.println("");
     for (int my_idx = 0;my_idx < my_addresses.length;my_idx++) {
       String my_str = my_addresses[my_idx];
       System.out.print("Test is_irciot_address_(\"" + my_str + "\") = ");
-      System.out.println(my_irciot.is_irciot_address_(my_str));
+      boolean my_bool = my_irciot.is_irciot_address_(my_str);
+      String my_out = "FAILED";
+      if (my_bool == my_results[my_idx]) my_out = "OK";
+      System.out.println(my_bool + " -- " + my_out);
+
     };
 
     String my_password = "MY_password-inside-stringxxx@";
@@ -46,7 +52,7 @@ class test_javairciot extends javairciot.jlayerirciot {
     if (my_crc32 != null) {
       System.out.print("Test irciot_crc_32_('" + my_password);
       System.out.print("') = 0x" + my_crc32);
-      if (my_crc32.equals("4d595f70")) System.out.println(" -- OK");
+      if (my_crc32.equals("08623ca6")) System.out.println(" -- OK");
       else System.out.println(" -- FAILED");
     } else System.out.println(" <null> -- FAILED");
   };
