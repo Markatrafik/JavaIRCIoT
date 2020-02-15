@@ -592,6 +592,7 @@ public class jlayerirc {
   //
   public boolean[] irc_queue_lock = new boolean[] { false, false };
   //
+  public int delta_time = 0;
   public int join_retry = 0;
   //
   public HashMap<String, String> irc_codes = null;
@@ -624,6 +625,7 @@ public class jlayerirc {
     //
     this.irc_layer_mode = CONST.irc_layer_modes[0];
     //
+    this.delta_time = 0;
     this.join_retry = 0;
 
   };
@@ -702,6 +704,11 @@ public class jlayerirc {
 
   // incomplete
   public void irc_track_clear_nicks_() {
+
+  };
+
+  // incomplete
+  public void irc_track_clarify_nicks_() {
 
   };
 
@@ -845,9 +852,9 @@ public class jlayerirc {
   };
 
   // incomplete
-  public Triplet<Integer, String, Integer> irc_recv_(int recv_timeout) {
+  public Triplet<Integer, StringBuffer, Integer> irc_recv_(int recv_timeout) {
 
-    return Triplet.with( -1, "", 0);
+    return Triplet.with( -1, new StringBuffer(""), 0);
   };
 
   // incomplete
@@ -1206,10 +1213,14 @@ public class jlayerirc {
     //
     String irc_vuid = CONST.api_vuid_cfg + "0";
     String irc_message = "";
+    String irc_prefix = ":" + this.irc_server + " ";
+    int irc_prefix_len = irc_prefix.length();
     StringBuffer irc_input_buffer = new StringBuffer(CONST.irc_buffer_size);
     Triplet<String, Integer, String> irc_pack;
+    Triplet<Integer, StringBuffer, Integer> irc_recv;
     //
     String my_nick = null;
+    String my_chankey = "";
     boolean my_private = false;
     //
     int try_sock = 0;
@@ -1243,21 +1254,46 @@ public class jlayerirc {
             + " " + this.irc_host + " 1 :" + this.irc_info) == -1)
             irc_init = 0;
         } else if (irc_init == 3) {
-
+          this.join_retry = 0;
+          my_chankey = "";
+          if (this.irc_send_(CONST.cmd_NICK + " "
+            + this.irc_nick) == -1) irc_init = 0;
         } else if (irc_init == 4) {
-
+          irc_wait = CONST.irc_default_wait;
+          this.join_retry += 1;
+          if (this.irc_chankey != null)
+            if (!this.irc_chankey.isEmpty())
+              my_chankey = " " + this.irc_chankey;
+          if (this.irc_send_(CONST.cmd_JOIN + " " + this.irc_channel
+            + my_chankey) == -1) irc_init = 0;
         } else if (irc_init == 5) {
-
+          irc_wait = CONST.irc_default_wait;
+          this.join_retry += 1;
+          if (this.irc_send_(CONST.cmd_JOIN + " " + this.irc_channel
+            + my_chankey + "\r\n") == -1) irc_init = 0;
         };
         if (irc_init > 0) {
-
+          irc_recv = this.irc_recv_(irc_wait);
+          irc_ret = irc_recv.getValue0();
+          irc_input_buffer = irc_recv.getValue1();
+          this.delta_time = irc_recv.getValue2();
         };
 
         irc_wait = CONST.irc_default_wait;
 
-        if (irc_ret == -1) {
+        if (this.delta_time > 0) {
+          irc_wait = this.delta_time;
+        } else if (irc_init == 6) this.irc_track_clarify_nicks_();
 
+        if (irc_ret == -1) {
+          this.irc_reconnect_();
+          irc_input_buffer = new StringBuffer("");
+          irc_init = 0;
+          this.irc = this.irc_socket_(this.irc_server);
         };
+
+        irc_prefix = ":" + this.irc_server + " ";
+        irc_prefix_len = irc_prefix.length();
 
         //
 
