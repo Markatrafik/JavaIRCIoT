@@ -58,7 +58,7 @@ public class jlayerirciot {
    //
    private static final long serialVersionUID = 32767;
    //
-   public String irciot_library_version = "0.0.175";
+   public String irciot_library_version = "0.0.177";
    //
    public String irciot_protocol_version = "0.3.31";
    //
@@ -852,7 +852,6 @@ public class jlayerirciot {
     try {
       JSONParser my_parser = new JSONParser();
       JSONObject my_datums = (JSONObject) my_parser.parse(in_datumset);
-    // } catch (ParseException my_ex) {
     } catch (Exception my_ex) {
       my_ex.printStackTrace();
       return "";

@@ -30,7 +30,6 @@ import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.lang.Thread;
 import org.json.simple.parser.JSONParser;
-// import org.json.simple.parser.ParseException;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.javatuples.Septet;
@@ -45,7 +44,7 @@ public class jlayerirc {
 
   public static final class init_constants {
    //
-   public String irciot_library_version = "0.0.175";
+   public String irciot_library_version = "0.0.177";
    //
    public String irciot_protocol_version = "0.3.31";
    //
@@ -567,6 +566,9 @@ public class jlayerirc {
   public String  irc_info   = CONST.irc_default_info;
   public String  irc_quit   = CONST.irc_default_quit;
   //
+  public String  irc_channel = CONST.irc_default_channel;
+  public String  irc_chankey = CONST.irc_default_chankey;
+  //
   public String  irc_nick_old  = null;
   public String  irc_nick_base = null;
   public String  irc_nick_try  = "";
@@ -580,6 +582,11 @@ public class jlayerirc {
   public boolean ident_run  = false;
   public String  ident_ip   = CONST.ident_default_ip;
   public int     ident_port = CONST.ident_default_port;
+  //
+  // This variable is not used to connect, if you don't have a server name
+  // and you want to use the IP, put its text value into self.irc_server
+  public String  irc_server_ip = null;
+  public int     irc_local_port = 0;
   //
   public ArrayBlockingQueue<Triplet<String, Integer, Integer>>[] irc_queue;
   //
@@ -656,6 +663,18 @@ public class jlayerirc {
   };
 
   // incomplete
+  public void start_ident_() {
+   this.ident_run = true;
+
+  };
+
+  // incomplete
+  public void stop_ident_() {
+    this.ident_run = false;
+
+  };
+
+  // incomplete
   public void start_IRC_() {
     this.irc_run = true;
 
@@ -668,6 +687,12 @@ public class jlayerirc {
 
     this.irc_disconnect_();
 
+  };
+
+  // incomplete
+  public String irc_track_get_nick_by_vuid_(int in_vuid) {
+
+    return null;
   };
 
   // incomplete
@@ -980,6 +1005,13 @@ public class jlayerirc {
   };
 
   // incomplete
+  public void irc_connect_(String in_server_ip, int int_server_port) {
+    if (this.irc_ident) this.start_ident_();
+
+    // this.irc_local_port = ...
+  };
+
+  // incomplete
   public void irc_disconnect_() {
 
     this.irc_track_clear_anons_();
@@ -1171,8 +1203,14 @@ public class jlayerirc {
     int irc_init = 0;
     int irc_wait = CONST.irc_first_wait;
     int irc_ret  = 0;
+    //
     String irc_vuid = CONST.api_vuid_cfg + "0";
+    String irc_message = "";
     StringBuffer irc_input_buffer = new StringBuffer(CONST.irc_buffer_size);
+    Triplet<String, Integer, String> irc_pack;
+    //
+    String my_nick = null;
+    boolean my_private = false;
     //
     int try_sock = 0;
     do {
@@ -1190,7 +1228,13 @@ public class jlayerirc {
         if (irc_init < 6)
           irc_init += 1;
         if (irc_init == 1) {
-
+          try {
+            this.irc_connect_(this.irc_server_ip, this.irc_port);
+          } catch (Exception my_ex) {
+            this.irc_disconnect_();
+            this.irc = this.irc_socket_(this.irc_server);
+            irc_init = 0;
+          };
         } else if (irc_init == 2) {
           if (this.irc_password != null)
             this.irc_send_(CONST.cmd_PASS + " " + this.irc_password);
@@ -1218,6 +1262,26 @@ public class jlayerirc {
         //
 
         if (irc_init > 5) {
+          irc_pack = irc_check_queue_(CONST.irc_queue_output);
+          irc_message = irc_pack.getValue0();
+          irc_wait = irc_pack.getValue1();
+          irc_vuid = irc_pack.getValue2();
+          if (!irc_message.isEmpty()) {
+            my_private = false;
+            if (!irc_vuid.equals(CONST.api_vuid_all)) {
+              my_nick = this.irc_track_get_nick_by_vuid_(irc_vuid);
+              if (!this.is_irc_nick_(my_nick)) my_private = true;
+              if (my_private) {
+                this.irc_send_(CONST.cmd_PRIVMSG + " "
+                  + my_nick + " :" + irc_message);
+              } else {
+                this.irc_send_(CONST.cmd_PRIVMSG + " "
+                  + this.irc_channel + " :" + irc_message);
+              };
+            };
+          };
+          irc_message = "";
+          //
 
         };
 
