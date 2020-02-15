@@ -58,7 +58,7 @@ public class jlayerirciot {
    //
    private static final long serialVersionUID = 32767;
    //
-   public String irciot_library_version = "0.0.177";
+   public String irciot_library_version = "0.0.178";
    //
    public String irciot_protocol_version = "0.3.31";
    //
