@@ -24,8 +24,10 @@ import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.ServerSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.lang.Thread;
@@ -659,8 +661,53 @@ public class jlayerirc {
     return this.irc_translate(in_input, CONST.irc_translation);
   };
 
+  public void irc_sleep_(int in_msec) {
+    if (in_msec < 1 && in_msec > 360000) return;
+    try {
+      Thread.sleep(in_msec);
+    } catch (InterruptedException my_ex) {};
+  };
+
   // incomplete
   public void ident_server_() {
+    if (!this.is_ip_address_(this.ident_ip)) return;
+    if (!this.is_ip_port_(this.ident_port)) return;
+    ServerSocket my_server_socket = null;
+    OutputStreamWriter my_osw = null;
+    InputStreamReader my_isr = null;
+    Socket my_socket = null;
+    while (this.ident_run) {
+      try {
+        my_server_socket = new ServerSocket(this.ident_port);
+
+      } catch (Exception my_ex) {
+        this.irc_sleep_(CONST.irc_default_wait);
+        continue;
+      };
+      while (this.ident_run) {
+        try {
+          my_socket = my_server_socket.accept();
+          my_osw = new OutputStreamWriter(my_socket.getOutputStream(), "UTF-8");
+          my_isr = new InputStreamReader(my_socket.getInputStream(), "UTF-8");
+          // BufferedReader my_input = new BufferedReader(my_isr);
+          if (my_isr.ready()) {
+
+          };
+          this.irc_sleep_(CONST.irc_micro_wait);
+          my_osw.close();
+          my_isr.close();
+          my_socket.close();
+        } catch (IOException my_ex) {
+        } catch (Exception my_ex) {
+        };
+        this.irc_sleep_(CONST.irc_micro_wait);
+      };
+      try {
+
+        my_server_socket.close();
+      } catch (Exception my_ex) {};
+      this.irc_sleep_(CONST.irc_micro_wait);
+    };
 
   };
 
@@ -756,6 +803,11 @@ public class jlayerirc {
     if (this.is_ipv4_address_(in_ip_address)) return true;
     if (this.is_ipv6_address_(in_ip_address)) return true;
     return false;
+  };
+
+  public boolean is_ip_port_(int in_ip_port) {
+    if (in_ip_port < 1 || in_ip_port > 65535) return false;
+    return true;
   };
 
   public boolean is_irc_nick_(String in_nick) {
@@ -1015,7 +1067,7 @@ public class jlayerirc {
   public void irc_connect_(String in_server_ip, int int_server_port) {
     if (this.irc_ident) this.start_ident_();
 
-    // this.irc_local_port = ...
+    this.irc_local_port = this.irc.getLocalPort();
   };
 
   // incomplete
@@ -1033,7 +1085,7 @@ public class jlayerirc {
    this.irc_disconnect_();
    // this.to_log_("Connection closed, reconnecting to IRC"
    //   + String.format(" (try: %d)", this.irc_recon));
-   // sleep(CONST.irc_first_wait * this.irc_recon)
+   this.irc_sleep_(CONST.irc_first_wait * this.irc_recon);
    this.irc_recon += 1;
    if (this.irc_recon > CONST.irc_recon_steps) this.irc_recon = 1;
   };
