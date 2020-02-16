@@ -676,6 +676,10 @@ public class jlayerirc {
     OutputStreamWriter my_osw = null;
     InputStreamReader my_isr = null;
     Socket my_socket = null;
+    String my_addr = null;
+    String my_data = null;
+    boolean my_ok = false;
+    char[] my_buffer = new char[CONST.irc_buffer_size + 1];
     while (this.ident_run) {
       try {
         my_server_socket = new ServerSocket(this.ident_port);
@@ -687,11 +691,42 @@ public class jlayerirc {
       while (this.ident_run) {
         try {
           my_socket = my_server_socket.accept();
+          my_addr = my_socket.getInetAddress().getHostAddress();
+          if ((!my_addr.equals(this.irc_server_ip)) &&
+              (!my_addr.equals("127.0.0.1")) &&
+              (!my_addr.equals("::1"))) {
+            my_socket.close();
+            break;
+          };
           my_osw = new OutputStreamWriter(my_socket.getOutputStream(), "UTF-8");
           my_isr = new InputStreamReader(my_socket.getInputStream(), "UTF-8");
           // BufferedReader my_input = new BufferedReader(my_isr);
+          StringBuilder my_str = new StringBuilder();
           if (my_isr.ready()) {
-
+            while (true) {
+              int my_count = my_isr.read(my_buffer);
+              if (my_count < 0) break;
+              my_str.append(my_buffer, 0, my_count);
+            };
+            my_data = my_str.toString().replaceAll("([\n\r ])", "");
+            if (my_data.isEmpty()) break;
+            String[] my_arr = my_data.split(":", 2);
+            my_ok = true;
+            String my_port = String.format("%d", this.irc_port);
+            if ((my_arr[0].isEmpty()) || (!my_arr[1].equals(my_port))) break;
+            if (this.is_ip_port_(this.irc_local_port)) {
+              my_port = String.format("%d", this.irc_local_port);
+              if (!my_arr[0].equals(my_port)) my_ok = false;
+            };
+            String my_out = String.format("%s , %s : ", my_arr[0], my_arr[1]);
+            if (my_ok) {
+              my_out += String.format("USERID : UNIX : %s\n", this.irc_user);
+            } else {
+              my_out += "ERROR : NO-USER\n";
+            };
+            my_osw.write(my_out);
+            this.ident_run = false;
+            break;
           };
           this.irc_sleep_(CONST.irc_micro_wait);
           my_osw.close();
@@ -703,12 +738,11 @@ public class jlayerirc {
         this.irc_sleep_(CONST.irc_micro_wait);
       };
       try {
-
         my_server_socket.close();
       } catch (Exception my_ex) {};
       this.irc_sleep_(CONST.irc_micro_wait);
     };
-
+    this.irc_sleep_(CONST.irc_micro_wait);
   };
 
   // incomplete
@@ -939,6 +973,19 @@ public class jlayerirc {
     return ret;
   };
 
+  public String irc_extract_single_(String in_string) {
+    String my_str = null;
+    try {
+      String[] my_arr = in_string.split(" ");
+      my_str = my_arr[3];
+    } catch (ArrayIndexOutOfBoundsException my_ex) {
+      return null;
+    } catch (Exception my_ex) {
+      return null;
+    };
+    return my_str;
+  };
+
   // incomplete
   public int irc_umode_(String in_channel, String in_nicks, String in_change, String in_umode) {
     if (!this.is_irc_channel_(in_channel)) return -1;
@@ -968,6 +1015,7 @@ public class jlayerirc {
     int in_ret = in_args.getValue0();
     int in_init = in_args.getValue1();
     int in_wait = in_args.getValue2();
+    String my_arr[] = null;
     switch (in_func) {
       case "NICKNAMEINUSE":
       case "ERRONEUSNICKNAME":
@@ -981,6 +1029,8 @@ public class jlayerirc {
       case "BANNEDFROMCHAN":
       case "CHANNELISFULL":
       case "BADCHANNELKEY":
+      case "NOSUCHCHANNEL":
+        // act like when nick is banned
         if (this.join_retry > 1) {
           if (this.irc_random_nick_(this.irc_nick, false) == 1) {
             this.join_retry += 1;
@@ -994,7 +1044,7 @@ public class jlayerirc {
       break;
       case "NAMREPLY":
         try {
-          String[] my_arr = in_string.split(":", 3);
+          my_arr = in_string.split(":", 3);
           if (my_arr[0].isEmpty()) {
             my_arr = my_arr[2].split(" ");
             for (int my_idx = 0;my_idx < my_arr.length;my_idx++) {
@@ -1012,15 +1062,24 @@ public class jlayerirc {
       case "WHOISUSER":
       break;
       case "ENDOFNAMES":
-      break;
+        try {
+          my_arr = in_string.split(" ");
+          in_ret = this.irc_who_channel_(my_arr[3]);
+        } catch (ArrayIndexOutOfBoundsException my_ex) {
+          return Triplet.with(in_ret, in_init, in_wait);
+        };
+        return Triplet.with(in_ret, in_init, CONST.irc_default_wait);
       case "WHOREPLY":
       break;
       case "NOSUCHNICK":
-      break;
+        String my_nick = this.irc_extract_single_(in_string);
+        if (my_nick != null) this.irc_track_delete_nick_(my_nick);
+        return Triplet.with(in_ret, in_init, CONST.irc_default_wait);
       case "BANNICKCHANGE":
       case "NONICKCHANGE":
         // restoring nick
-      break;
+        this.irc_nick = this.irc_nick_old;
+        return Triplet.with(in_ret, 3, in_wait);
       default: break;
     };
     return Triplet.with(in_ret, in_init, in_wait);

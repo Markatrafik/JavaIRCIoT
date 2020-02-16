@@ -711,16 +711,21 @@ public class jlayerirciot {
     if (in_vuid == null) return;
     if (!in_datum.containsKey(CONST.tag_DATUM_ID)) return;
     if (!in_datum.containsKey(CONST.tag_DATE_TIME)) return;
-    if ((in_ot == CONST.ot_BCH_INFO) ||
-        (in_ot == CONST.ot_BCH_ACK)) {
+    if ((in_ot.equals(CONST.ot_BCH_INFO)) ||
+        (in_ot.equals(CONST.ot_BCH_ACK))) {
+      if (in_ot.equals(CONST.ot_ENC_ACK)) {
+        // It is necessary to check whether the request
+        // (ot == "encreq") was, or is it a fake answer
+      };
 
-    } else if (in_ot == CONST.ot_BCH_REQUEST) {
+    } else if (in_ot.equals(CONST.ot_BCH_REQUEST)) {
 
-    } else if ((in_ot == CONST.ot_ENC_INFO) ||
-        (in_ot == CONST.ot_ENC_ACK)) {
+    } else if ((in_ot.equals(CONST.ot_ENC_INFO)) ||
+        (in_ot.equals(CONST.ot_ENC_ACK))) {
 
-    } else if (in_ot == CONST.ot_ENC_REQUEST) {
-
+    } else if (in_ot.equals(CONST.ot_ENC_REQUEST)) {
+      // this.irciot_encryption_key_publication_(
+      //   this.encryption_public_key, CONST.ot_ENC_ACK, in_vuid);
     };
   };
   // End of irciot_check_datum_()
