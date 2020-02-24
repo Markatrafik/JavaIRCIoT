@@ -34,7 +34,9 @@ import java.lang.Thread;
 import org.json.simple.parser.JSONParser;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
+import org.javatuples.Quartet;
 import org.javatuples.Septet;
+import org.javatuples.Decade;
 
 @SuppressWarnings("unchecked")
 
@@ -46,7 +48,7 @@ public class jlayerirc {
 
   public static final class init_constants {
    //
-   public String irciot_library_version = "0.0.178";
+   public String irciot_library_version = "0.0.179";
    //
    public String irciot_protocol_version = "0.3.31";
    //
@@ -568,6 +570,10 @@ public class jlayerirc {
   public String  irc_info   = CONST.irc_default_info;
   public String  irc_quit   = CONST.irc_default_quit;
   //
+  public Quartet<String, String, String, String>[] irc_nicks;
+  public Decade<String, String, String, String, String,
+         String, String, String, String, String>[] irc_anons;
+  //
   public String  irc_channel = CONST.irc_default_channel;
   public String  irc_chankey = CONST.irc_default_chankey;
   //
@@ -585,8 +591,11 @@ public class jlayerirc {
   public String  ident_ip   = CONST.ident_default_ip;
   public int     ident_port = CONST.ident_default_port;
   //
+  public boolean irc_talk_with_strangers
+    = CONST.irc_default_talk_with_strangers;
+  //
   // This variable is not used to connect, if you don't have a server name
-  // and you want to use the IP, put its text value into self.irc_server
+  // and you want to use the IP, put its text value into this.irc_server
   public String  irc_server_ip = null;
   public int     irc_local_port = 0;
   //
@@ -594,8 +603,11 @@ public class jlayerirc {
   //
   public boolean[] irc_queue_lock = new boolean[] { false, false };
   //
-  public int delta_time = 0;
-  public int join_retry = 0;
+  public long time_now   = 0;
+  public long time_ping  = 0;
+  public int  delta_time = 0;
+  public long delta_ping = 0;
+  public int  join_retry = 0;
   //
   public HashMap<String, String> irc_codes = null;
   public HashMap<String, String> irc_commands = null;
@@ -629,7 +641,12 @@ public class jlayerirc {
     //
     this.delta_time = 0;
     this.join_retry = 0;
-
+    //
+    this.time_now  = System.currentTimeMillis();
+    this.time_ping = this.time_now;
+    this.delta_time = 0;
+    this.delta_ping = 0;
+    //
   };
 
   public void finalize() throws Throwable {
@@ -769,6 +786,77 @@ public class jlayerirc {
     this.ident_run = false;
 
     this.irc_disconnect_();
+
+  };
+
+  public void irc_track_fast_nick_(String in_nick, String in_mask) {
+    boolean my_ok = true;
+    for (int my_idx = 0;my_idx < this.irc_nicks.length;my_idx++) {
+      Quartet<String, String, String, String> my_struct
+        = this.irc_nicks[ my_idx ];
+      if (in_nick.equals(my_struct.getValue0())) my_ok = false;
+    };
+    if (my_ok) this.irc_track_add_nick_(in_nick, in_mask, null, null);
+  };
+
+  // incomplete
+  public void irc_track_add_nick_(String in_nick, String in_mask,
+    String in_vuid, String in_info) {
+    if (!this.is_irc_nick_(in_nick)) return;
+    if (in_nick.equals(this.irc_nick)) return;
+    Quartet<String, String, String, String> my_struct
+      = this.irc_track_get_nick_struct_by_nick_(in_nick);
+    if (my_struct == null) {
+
+    } else this.irc_track_update_nick_(in_nick, in_mask, in_vuid, in_info);
+  };
+
+  // incomplete
+  public Quartet<String, String, String, String>
+    irc_track_get_nick_struct_by_nick_(String in_nick) {
+
+    return Quartet.with("", "", "", "");
+  };
+
+  // incomplete
+  public void irc_track_update_nick_(String in_nick, String in_mask,
+    String in_vuid, String in_info) {
+    if (!this.is_irc_nick_(in_nick)) return;
+    if (in_nick.equals(this.irc_nick)) return;
+    for (int my_idx = 0;my_idx < this.irc_nicks.length;my_idx++) {
+      Quartet<String, String, String, String> my_struct
+        = this.irc_nicks[ my_idx ];
+      String my_nick = my_struct.getValue0();
+      String my_mask = my_struct.getValue1();
+      String my_vuid = my_struct.getValue2();
+      String my_info = my_struct.getValue3();
+      // comparing of the masks will be here ...
+      // this.irc_check_mask_(in_from, in_mask)
+      if (this.irc_compare_nicks_(my_nick, in_nick)) {
+        if (my_mask != null) {
+          my_mask = in_mask;
+          if (my_vuid == null)
+            my_vuid = this.irc_get_vuid_by_mask_(my_mask, this.irc_channel);
+        };
+        if (my_vuid != null) my_vuid = in_vuid;
+        if (my_info != null) my_info = in_info;
+        this.irc_nicks[ my_idx ]
+          = Quartet.with(in_nick, my_mask, my_vuid, my_info);
+        if (this.irc_talk_with_strangers)
+          this.irc_track_update_anons_by_vuid_(my_vuid,
+            my_mask, this.irc_channel, null, null,
+              null, null, null, null, null);
+        break;
+      };
+    };
+
+  };
+
+  // incomplete
+  public void irc_track_update_anons_by_vuid_(String in_vuid,
+    String in_mask, String in_channel, String in_opt,
+    String in_ekey, String in_bkey, String in_lmid,
+    String in_ekto, String in_bkto, String in_omid) {
 
   };
 
@@ -918,6 +1006,15 @@ public class jlayerirc {
     return ret;
   };
 
+  public void irc_check_and_restore_nick_() {
+    if (!this.irc_nick.equals(this.irc_nick_base)) {
+      if (this.irc_send_(CONST.cmd_NICK) != -1) {
+        this.irc_nick_old = this.irc_nick;
+        this.irc_nick = this.irc_nick_base;
+      };
+    };
+  };
+
   // incomplete
   public int irc_send_(String irc_out) {
     if (irc_out == null || irc_out.isEmpty()) return -1;
@@ -1051,7 +1148,7 @@ public class jlayerirc {
               String my_nick = my_arr[my_idx];
               if (my_nick.charAt(0) == '@') {
                 my_nick = my_nick.substring(1);
-                // this.irc_track_add_nick_(my_nick, null, null, null);
+                this.irc_track_add_nick_(my_nick, null, null, null);
               };
             };
           };
@@ -1323,8 +1420,11 @@ public class jlayerirc {
     int irc_ret  = 0;
     //
     String irc_vuid = CONST.api_vuid_cfg + "0";
+    String irc_mask = "";
     String irc_message = "";
     String irc_prefix = ":" + this.irc_server + " ";
+    String irc_input_split = "";
+    String irc_input_cmd = "";
     int irc_prefix_len = irc_prefix.length();
     StringBuffer irc_input_buffer = new StringBuffer(CONST.irc_buffer_size);
     Triplet<String, Integer, String> irc_pack;
@@ -1343,7 +1443,7 @@ public class jlayerirc {
     while (this.irc_run) {
       // try {
         if (this.irc == null) {
-          // Thread.speep(CONST.irc_micro_wait);
+          this.irc_sleep_(CONST.irc_micro_wait);
           this.irc = this.irc_socket_(this.irc_server);
           irc_init = 0;
         };
@@ -1394,7 +1494,8 @@ public class jlayerirc {
 
         if (this.delta_time > 0) {
           irc_wait = this.delta_time;
-        } else if (irc_init == 6) this.irc_track_clarify_nicks_();
+        } else
+          if (irc_init == 6) this.irc_track_clarify_nicks_();
 
         if (irc_ret == -1) {
           this.irc_reconnect_();
@@ -1405,6 +1506,49 @@ public class jlayerirc {
 
         irc_prefix = ":" + this.irc_server + " ";
         irc_prefix_len = irc_prefix.length();
+
+        String[] my_irc_array = irc_input_buffer.toString().split("[\r\n]");
+
+        for (int my_idx = 0;my_idx < my_irc_array.length;my_idx++) {
+          irc_input_split = my_irc_array[ my_idx ];
+          if (irc_input_split.substring(5).equals(CONST.cmd_PING + " ")) {
+            this.delta_ping = this.time_now - this.time_ping;
+            this.time_ping = this.time_now;
+            if (this.irc_pong_(irc_input_split) == -1) {
+              irc_ret  = -1;
+              irc_init =  0;
+            } else this.irc_track_clarify_nicks_();
+          };
+          try {
+            String[] my_cmd_array = irc_input_split.split(" ");
+            irc_input_cmd = my_cmd_array[1];
+          } catch (Exception my_ex) {
+            irc_input_cmd = "";
+          };
+
+          //
+
+          if (irc_input_cmd.equals(CONST.cmd_PRIVMSG) ||
+            irc_input_split.isEmpty()) {
+            irc_nick = "";
+            irc_mask = "!@";
+            irc_vuid = null;
+            irc_message = null;
+            if (!irc_input_split.isEmpty()) {
+              Pair<String, String> my_pair = this.irc_extract_nick_mask_(irc_input_split);
+              irc_nick = my_pair.getValue0();
+              irc_mask = my_pair.getValue1();
+              this.irc_track_fast_nick_(irc_nick, irc_mask);
+
+              //
+
+            };
+
+          };
+
+          //
+
+        }; // End of the loop of processing raw IRC messages
 
         //
 
@@ -1428,7 +1572,13 @@ public class jlayerirc {
             };
           };
           irc_message = "";
-          //
+          if ((this.time_now - this.time_ping > this.delta_ping * 2)
+            && (this.delta_ping > 0)) {
+            if (this.irc_who_channel_(this.irc_channel) == -1) {
+              irc_init = 0;
+            } else this.irc_check_and_restore_nick_();
+            this.delta_ping = 0;
+          };
 
         };
 
