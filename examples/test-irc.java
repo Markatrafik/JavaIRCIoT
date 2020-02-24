@@ -51,6 +51,12 @@ class test_IRC extends javairciot.jlayerirc {
     System.out.println(my_str + "\"");
     System.out.print("Test is_irc_nick_(\"" + my_str + "\") = ");
     System.out.println(my_irc.is_irc_nick_(my_str));
+    my_str = "askbill@microsoft.com";
+    System.out.print("\nTest is_pattern_(\"" + my_str + "\", \".*!.*@.*\") = ");
+    System.out.println(my_irc.is_pattern_(my_str, ".*!.*@.*"));
+    my_str = "MyRobot!irc@irc-iot.nsk.ru";
+    System.out.print("Test is_pattern_(\"" + my_str + "\", \".*!.*@.*\") = ");
+    System.out.println(my_irc.is_pattern_(my_str, ".*!.*@.*"));
   };
   
   public static void main(String args[]) {

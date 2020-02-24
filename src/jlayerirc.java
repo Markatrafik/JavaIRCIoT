@@ -573,6 +573,8 @@ public class jlayerirc {
   public Quartet<String, String, String, String>[] irc_nicks;
   public Decade<String, String, String, String, String,
          String, String, String, String, String>[] irc_anons;
+  public Decade<String, String, String, String, String,
+       String, String, Integer, Integer, String>[] irc_users;
   //
   public String  irc_channel = CONST.irc_default_channel;
   public String  irc_chankey = CONST.irc_default_chankey;
@@ -789,6 +791,17 @@ public class jlayerirc {
 
   };
 
+  public Quartet<String, String, String, String>
+    irc_track_get_nick_struct_by_vuid_(String in_vuid) {
+    for (int my_idx = 0;my_idx < this.irc_nicks.length;my_idx++) {
+      Quartet<String, String, String, String> my_struct
+        = this.irc_nicks[ my_idx ];
+      if (in_vuid.equals(my_struct.getValue2()))
+        return my_struct;
+    };
+    return (Quartet<String, String, String, String>) null;
+  };
+
   public void irc_track_fast_nick_(String in_nick, String in_mask) {
     boolean my_ok = true;
     for (int my_idx = 0;my_idx < this.irc_nicks.length;my_idx++) {
@@ -860,36 +873,45 @@ public class jlayerirc {
 
   };
 
-  // incomplete
-  public String irc_track_get_nick_by_vuid_(int in_vuid) {
-
-    return null;
+  public String irc_track_get_nick_by_vuid_(String in_vuid) {
+    for (int my_idx = 0;my_idx < this.irc_nicks.length;my_idx++) {
+      Quartet<String, String, String, String> my_struct
+        = this.irc_nicks[ my_idx ];
+      if (in_vuid.equals(my_struct.getValue2()))
+        return my_struct.getValue0();
+    };
+    return (String) null;
   };
 
-  // incomplete
   public void irc_track_clear_anons_() {
-
+    this.irc_anons = Arrays.copyOf(this.irc_anons, 0);
   };
 
-  // incomplete
   public void irc_track_clear_nicks_() {
-
+    this.irc_nicks = Arrays.copyOf(this.irc_nicks, 0);
   };
 
-  // incomplete
   public void irc_track_clarify_nicks_() {
-
+    for (int my_idx = 0;my_idx < this.irc_nicks.length;my_idx++) {
+      Quartet<String, String, String, String> my_struct
+        = this.irc_nicks[ my_idx ];
+      String my_nick = my_struct.getValue0();
+      String my_mask = my_struct.getValue1();
+      String my_vuid = my_struct.getValue2();
+      String my_info = my_struct.getValue3();
+      if ((my_mask == null) || (my_info == null)) {
+        this.irc_whois_nick_(my_nick);
+        if (my_mask == null) my_mask = "";
+        if (my_info == null) my_info = "";
+        this.irc_track_update_nick_(my_nick, my_mask, my_vuid, my_info);
+        return;
+      };
+    };
   };
 
   // incomplete
   public void irc_track_delete_nick_(String in_nick) {
 
-  };
-
-  // incomplete
-  public String irc_track_get_nick_by_vuid_(String in_vuid) {
-
-    return (String) null;
   };
 
   public String[] irc_get_list_(Object in_input) {
@@ -904,8 +926,8 @@ public class jlayerirc {
   public boolean is_pattern_(String in_string, String in_pattern) {
     if (in_string == null || in_string.isEmpty()) return false;
     boolean my_check = true;
-    Pattern my_pattern = Pattern.compile(in_pattern);
     try {
+      Pattern my_pattern = Pattern.compile(in_pattern);
       Matcher my_matcher = my_pattern.matcher(in_string);
       my_check = my_matcher.matches();
       if (!my_check) return false;
@@ -964,13 +986,19 @@ public class jlayerirc {
     return false;
   };
 
-  // incomplete
+  // incomplete (testing)
   public boolean irc_check_mask_(String in_from, String in_mask) {
-
-    return false;
+    String str_from = this.irc_tolower_(in_from);
+    String str_mask = this.irc_tolower_(in_mask).replace("\\", "\\\\");
+    String my_chars = ".$|[](){}+";
+    for (int my_idx = 0;my_idx < my_chars.length();my_idx++) {
+      char my_char = my_chars.charAt(my_idx);
+      str_mask = str_mask.replace("" + my_char, "\\" + my_char);
+    };
+    str_mask = str_mask.replace("?", ".").replace("*", ".*");
+    return this.is_pattern_(in_from, str_mask);
   };
 
-  // incomplete
   public void irc_define_nick_(String in_nick) {
     if (!this.is_irc_nick_(in_nick)) return;
     this.irc_nick = in_nick;
@@ -1199,13 +1227,13 @@ public class jlayerirc {
   // incomplete
   public String irc_get_vuid_by_mask_(String in_mask, String in_channel) {
 
-    return null;
+    return (String) null;
   };
 
   // incomplete
   public String irc_get_vuid_type_(String in_vuid) {
 
-    return null;
+    return (String) null;
   };
 
   public boolean is_json_(String in_message) {
