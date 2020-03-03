@@ -1452,6 +1452,7 @@ public class jlayerirc {
     String irc_message = "";
     String irc_prefix = ":" + this.irc_server + " ";
     String irc_input_split = "";
+    String irc_input_key = "";
     String irc_input_cmd = "";
     int irc_prefix_len = irc_prefix.length();
     StringBuffer irc_input_buffer = new StringBuffer(CONST.irc_buffer_size);
@@ -1547,6 +1548,7 @@ public class jlayerirc {
               irc_init =  0;
             } else this.irc_track_clarify_nicks_();
           };
+
           try {
             String[] my_cmd_array = irc_input_split.split(" ");
             irc_input_cmd = my_cmd_array[1];
@@ -1554,7 +1556,37 @@ public class jlayerirc {
             irc_input_cmd = "";
           };
 
-          //
+          if ((irc_input_split.substring(irc_prefix_len).equals(irc_prefix))
+               && (!irc_input_cmd.isEmpty())) {
+            // Parse codes only from valid server
+            try {
+              irc_input_key = this.irc_codes.get(irc_input_cmd);
+            } catch(Exception my_ex) {
+              irc_input_key = ""; // Unknwon IRC code
+            };
+            if (irc_input_key.isEmpty()) {
+              try {
+                irc_input_key = this.irc_commands.get(irc_input_cmd);
+              } catch (Exception my_ex) {
+                irc_input_key = ""; // Unknwon IRC command
+              };
+            };
+            if (!irc_input_key.isEmpty()) {
+              try {
+                Triplet<Integer, Integer, Integer> my_pack_in
+                  = Triplet.with(irc_ret, irc_init, irc_wait);
+                Triplet<Integer, Integer, Integer> my_pack_out
+                  = this.multi_function_(irc_input_key,
+                    irc_input_split, my_pack_in);
+                irc_ret  = my_pack_out.getValue0();
+                irc_init = my_pack_out.getValue1();
+                irc_wait = my_pack_out.getValue2();
+              } catch (Exception my_ex) {
+                irc_ret  = -1;
+                irc_wait = CONST.irc_micro_wait;
+              };
+            };
+          };
 
           if (irc_input_cmd.equals(CONST.cmd_PRIVMSG) ||
             irc_input_split.isEmpty()) {
@@ -1563,10 +1595,21 @@ public class jlayerirc {
             irc_vuid = null;
             irc_message = null;
             if (!irc_input_split.isEmpty()) {
-              Pair<String, String> my_pair = this.irc_extract_nick_mask_(irc_input_split);
+              Pair<String, String> my_pair
+                = this.irc_extract_nick_mask_(irc_input_split);
               irc_nick = my_pair.getValue0();
               irc_mask = my_pair.getValue1();
               this.irc_track_fast_nick_(irc_nick, irc_mask);
+
+              //
+
+              irc_message = this.irc_extract_message_(irc_input_split);
+
+              if ((irc_message == null)
+               && (irc_input_buffer.toString().isEmpty())) {
+
+                irc_message = "";
+              };
 
               //
 
