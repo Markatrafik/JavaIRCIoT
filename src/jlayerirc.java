@@ -48,7 +48,7 @@ public class jlayerirc {
 
   public static final class init_constants {
    //
-   public String irciot_library_version = "0.0.183";
+   public String irciot_library_version = "0.0.185";
    //
    public String irciot_protocol_version = "0.3.31";
    //
