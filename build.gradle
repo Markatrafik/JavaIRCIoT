@@ -6,7 +6,7 @@ apply plugin: 'com.android.library'
 ext {
     PUBLISH_GROUP_ID="javairciot"
     PUBLISH_ARTIFACT_ID="javairciot"
-    PUBLISH_VERSION = "0.0.185"
+    PUBLISH_VERSION = "0.0.187"
     BUILD_TOOLS = "25.0.0"
     TARGET_SDK = 25
 }

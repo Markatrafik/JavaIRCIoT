@@ -8,6 +8,10 @@ export BINARY_AWK="/usr/bin/awk"
 export BINARY_BASENAME="/usr/bin/basename"
 export BINARY_DIRNAME="/usr/bin/dirname"
 export SCRIPT_BUILD="./my_build.sh"
+export CLASSPATH="/usr/share/java"
+export CLASSPATH="${CLASSPATH}:/usr/share/java/json-simple-1.1.1.jar"
+export CLASSPATH="${CLASSPATH}:/usr/share/java/javatuples.jar"
+export JAVA_OPTIONS="-Djava.net.preferIPv4Stack=true"
 
 if [ -x "${BINARY_DIRNAME}" ]; then
  cd "$("${BINARY_DIRNAME}" "${0}" 2>/dev/null)"
@@ -52,7 +56,8 @@ if [ ! -h "./${PACKAGE_NAME}" ]; then
 fi
 if [ -f "./${TEST_CLASS}.class" ]; then
  echo -ne "Trying to Run: '\033[1m./${TEST_CLASS}.class\033[0m' ...\n\n"
- "${BINARY_JAVA}" "${TEST_CLASS}" ; ERRLV=$?
+ export CLASSPATH="${CLASSPATH}:."
+ "${BINARY_JAVA}" ${JAVA_OPTIONS} "${TEST_CLASS}" ; ERRLV=$?
  if [ ${ERRLV} -eq 0 ]; then echo -ne "\n\033[1;32mAll OK\033[0m (test)\n"
  exit 0 ; fi
  exit 1
