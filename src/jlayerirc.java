@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Set;
 import java.net.Socket;
@@ -29,6 +30,7 @@ import java.net.SocketException;
 import java.net.ServerSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.nio.channels.Selector;
 import java.nio.channels.SelectionKey;
@@ -65,16 +67,17 @@ public class jlayerirc implements Runnable {
    //
    public boolean irc_default_debug = DO_debug_library;
    //
-   public int irc_first_wait = 2800; // in milliseconds
+   public int irc_first_wait = 3200; // in milliseconds
    public int irc_micro_wait = 120;
-   public int irc_default_wait = 28000;
-   public int irc_latency_wait = 1000;
+   public int irc_default_wait = 2800;
+   public int irc_latency_wait = 600;
    //
    public String irc_default_nick = "MyBot";
    public String irc_default_info = "IRC-IoT Bot";
    public String irc_default_quit = "Bye!";
    //
    public String irc_default_server = "irc-iot.nsk.ru";
+   public String irc_default_host  = "localhost";
    public int    irc_default_port  = 6667;
    public String irc_default_password = null;
    public boolean irc_default_ssl  = false;
@@ -596,9 +599,9 @@ public class jlayerirc implements Runnable {
   //
   public int     irc_status = 0;
   public int     irc_recon = 1;
-  public Object  irc_task = null;
+  public Thread  irc_task = null;
   //
-  public Object  ident_task = null;
+  public Thread  ident_task = null;
   public boolean ident_run  = false;
   public String  ident_ip   = CONST.ident_default_ip;
   public int     ident_port = CONST.ident_default_port;
@@ -626,13 +629,8 @@ public class jlayerirc implements Runnable {
   //
   public jlayerirc() { // Class constructor
     //
-    try {
-      this.irc_host = InetAddress.getLocalHost().getHostName();
-    } catch (UnknownHostException my_ex) {
-      this.irc_host = "localhost";
-    };
-    //
-    this.irc_server = CONST.irc_default_server;
+    this.irc_init_server_ip_(CONST.irc_default_server);
+    this.irc_host = this.irc_get_irc_host_(this.irc_server_ip);
     this.irc_port = CONST.irc_default_port;
     this.irc_nick = CONST.irc_default_nick;
     this.irc_user = this.irc_tolower_(CONST.irc_default_nick);
@@ -671,6 +669,32 @@ public class jlayerirc implements Runnable {
       System.out.println(in_ex);
       in_ex.printStackTrace();
     } catch (Exception my_ex) {};
+  };
+
+  // incomplete
+  public String irc_get_irc_host_(String in_server_ip) {
+    String my_host = CONST.irc_default_host;
+    try {
+      my_host = InetAddress.getLocalHost().getHostName();
+      Enumeration<NetworkInterface> my_ifaces
+         = NetworkInterface.getNetworkInterfaces();
+      while (my_ifaces.hasMoreElements()) {
+         NetworkInterface my_iface = my_ifaces.nextElement();
+         if (!my_iface.isUp()) continue;
+         Enumeration<InetAddress> my_addrs = my_iface.getInetAddresses();
+         while (my_addrs.hasMoreElements()) {
+           InetAddress my_addr = my_addrs.nextElement();
+           String my_name = my_addr.getHostName();
+           if (!this.is_ip_address_(my_name) &&
+             !my_name.equals(CONST.irc_default_host)) my_host = my_name;
+         };
+      };
+    } catch (UnknownHostException my_ex) {
+    } catch (SocketException my_ex) {
+    } catch (Exception my_ex) {
+      this.irc_exception_(my_ex);
+    };
+    return my_host;
   };
 
   public String irc_translate(String in_str, HashMap<Character, Character> in_map) {
@@ -728,9 +752,9 @@ public class jlayerirc implements Runnable {
         try {
           my_socket = my_server_socket.accept();
           my_addr = my_socket.getInetAddress().getHostAddress();
-          if ((!my_addr.equals(this.irc_server_ip)) &&
-              (!my_addr.equals("127.0.0.1")) &&
-              (!my_addr.equals("::1"))) {
+          if (!my_addr.equals(this.irc_server_ip) &&
+              !my_addr.equals("127.0.0.1") &&
+              !my_addr.equals("::1")) {
             my_socket.close();
             break;
           };
@@ -749,7 +773,7 @@ public class jlayerirc implements Runnable {
             String[] my_arr = my_data.split(":", 2);
             my_ok = true;
             String my_port = String.format("%d", this.irc_port);
-            if ((my_arr[0].isEmpty()) || (!my_arr[1].equals(my_port))) break;
+            if (my_arr[0].isEmpty() || !my_arr[1].equals(my_port)) break;
             if (this.is_ip_port_(this.irc_local_port)) {
               my_port = String.format("%d", this.irc_local_port);
               if (!my_arr[0].equals(my_port)) my_ok = false;
@@ -780,6 +804,7 @@ public class jlayerirc implements Runnable {
     };
     this.irc_sleep_(CONST.irc_micro_wait);
   };
+  // End of ident_server_()
 
   // incomplete
   public void start_ident_() {
@@ -792,7 +817,6 @@ public class jlayerirc implements Runnable {
 
   };
 
-  // incomplete
   public void start_IRC_() {
     Thread my_thread = new Thread(this);
     this.irc_run = true;
@@ -806,6 +830,10 @@ public class jlayerirc implements Runnable {
     this.ident_run = false;
     this.irc_sleep_(CONST.irc_default_wait);
     this.irc_disconnect_();
+    this.irc_sleep_(CONST.irc_micro_wait);
+    try {
+      if (this.irc_task != null) this.irc_task.interrupt();
+    } catch (Exception my_ex) {};
   };
 
   public Quartet<String, String, String, String>
@@ -821,11 +849,13 @@ public class jlayerirc implements Runnable {
 
   public void irc_track_fast_nick_(String in_nick, String in_mask) {
     boolean my_ok = true;
-    for (int my_idx = 0;my_idx < this.irc_nicks.length;my_idx++) {
-      Quartet<String, String, String, String> my_struct
-        = this.irc_nicks[ my_idx ];
-      if (in_nick.equals(my_struct.getValue0())) my_ok = false;
-    };
+    if (!this.is_irc_nick_(in_nick)) return;
+    if (this.irc_nicks != null)
+      for (int my_idx = 0;my_idx < this.irc_nicks.length;my_idx++) {
+        Quartet<String, String, String, String> my_struct
+          = this.irc_nicks[ my_idx ];
+        if (in_nick.equals(my_struct.getValue0())) my_ok = false;
+      };
     if (my_ok) this.irc_track_add_nick_(in_nick, in_mask, null, null);
   };
 
@@ -881,6 +911,7 @@ public class jlayerirc implements Runnable {
     };
 
   };
+  // End of irc_track_update_nick_()
 
   // incomplete
   public void irc_track_update_anons_by_vuid_(String in_vuid,
@@ -1054,6 +1085,7 @@ public class jlayerirc implements Runnable {
     };
     return ret;
   };
+  // End of irc_random_nick_()
 
   public void irc_check_and_restore_nick_() {
     if (!this.irc_nick.equals(this.irc_nick_base)) {
@@ -1112,6 +1144,7 @@ public class jlayerirc implements Runnable {
     };
     return 0;
   };
+  // End of irc_send_()
 
   public Triplet<Integer, StringBuffer, Integer> irc_recv_empty_(int in_result) {
     this.irc_sleep_(CONST.irc_latency_wait);
@@ -1196,6 +1229,7 @@ public class jlayerirc implements Runnable {
 
   public int irc_quit_() {
     int ret = this.irc_send_(CONST.cmd_QUIT + " :" + this.irc_quit + "\r\n");
+    this.irc_sleep_(CONST.irc_latency_wait);
     return ret;
   };
 
@@ -1348,18 +1382,30 @@ public class jlayerirc implements Runnable {
     return true;
   };
 
+  public InetAddress irc_init_server_ip_(String in_server) {
+    InetAddress my_ip = null;
+    try {
+      my_ip = InetAddress.getByName(in_server);
+      String my_ip_str = my_ip.toString();
+      String[] my_ip_arr = my_ip_str.split("/");
+      my_ip_str = my_ip_arr[1];
+      this.irc_server_ip = my_ip_str;
+      this.irc_server = in_server;
+    } catch (Exception my_ex) {
+      return null;
+    };
+    return my_ip;
+  };
+
   // incomplete
   public void irc_connect_(String in_server, int in_server_port) {
     if (this.irc_ident) this.start_ident_();
     try {
-      InetAddress my_ip = InetAddress.getByName(in_server);
-      String my_ip_str = my_ip.toString();
-      String[] my_ip_arr = my_ip_str.split("/");
-      my_ip_str = my_ip_arr[1];
-      if (this.is_ipv6_address_(my_ip_str)) {
+      InetAddress my_ip = this.irc_init_server_ip_(in_server);
+      if (my_ip == null) return;
+      if (this.is_ipv6_address_(this.irc_server_ip)) {
 
       };
-      this.irc_server_ip = my_ip_str;
       InetSocketAddress my_addr = new InetSocketAddress(my_ip, in_server_port);
       this.irc.connect(my_addr);
       this.irc_sleep_(CONST.irc_latency_wait);
@@ -1391,13 +1437,15 @@ public class jlayerirc implements Runnable {
       return;
     }
   };
+  // End of irc_connect_()
 
   // incomplete
   public void irc_disconnect_() {
     this.irc_track_clear_anons_();
     this.irc_track_clear_nicks_();
     try {
-      // ???
+      if (this.irc.isConnected()) this.irc_quit_();
+      this.irc_sleep_(CONST.irc_micro_wait);
       this.irc.close();
     } catch (IOException my_ex) {
       this.irc_exception_(my_ex);
@@ -1438,8 +1486,10 @@ public class jlayerirc implements Runnable {
   public String irc_extract_message_(String in_string) {
     try {
       String[] my_arr1 = in_string.split(CONST.cmd_PRIVMSG);
+      int my_len = my_arr1[0].length() + 7;
       String[] my_arr2 = my_arr1[1].split(":");
-      String my_str = my_arr2[1];
+      my_len += my_arr2[0].length() + 1;
+      String my_str = in_string.substring(my_len);
       return my_str.trim();
     } catch (Exception my_ex) { return null; }
   };
@@ -1611,7 +1661,7 @@ public class jlayerirc implements Runnable {
     //
     int try_sock = 0;
     do {
-      this.irc_sleep_(CONST.irc_first_wait);
+      if (try_sock > 0) this.irc_sleep_(CONST.irc_first_wait);
       this.irc = this.irc_socket_();
     } while (this.irc == null && try_sock++ < 3);
     //
@@ -1631,7 +1681,6 @@ public class jlayerirc implements Runnable {
         };
         if (irc_init < 6)
           irc_init += 1;
-        System.out.println("irc_init = {" + irc_init + "}");
         if (irc_init == 1) {
           try {
             this.irc_connect_(this.irc_server, this.irc_port);
@@ -1654,6 +1703,7 @@ public class jlayerirc implements Runnable {
           my_chankey = "";
           if (this.irc_send_(CONST.cmd_NICK + " "
             + this.irc_nick) == -1) irc_init = 0;
+          else this.irc_sleep_(CONST.irc_first_wait);
         } else if (irc_init == 4) {
           irc_wait = CONST.irc_default_wait;
           this.join_retry += 1;
@@ -1703,10 +1753,10 @@ public class jlayerirc implements Runnable {
 
         for (int my_idx = 0;my_idx < my_irc_array.length;my_idx++) {
           irc_input_split = my_irc_array[ my_idx ];
-          if (irc_input_split.isEmpty()) continue;
+          if (irc_input_split.trim().isEmpty()) continue;
           System.out.println("irc_input_split = {" + irc_input_split + "}");
           if (irc_input_split.length() > 5)
-            if (irc_input_split.substring(5).equals(CONST.cmd_PING + " ")) {
+            if (irc_input_split.substring(0,5).equals(CONST.cmd_PING + " ")) {
               this.delta_ping = this.time_now - this.time_ping;
               this.time_ping = this.time_now;
               if (this.irc_pong_(irc_input_split) == -1) {
@@ -1723,17 +1773,20 @@ public class jlayerirc implements Runnable {
           };
 
           if (irc_input_split.length() > irc_prefix_len)
-            if ((irc_input_split.substring(irc_prefix_len).equals(irc_prefix))
+            if ((irc_input_split.substring(0,irc_prefix_len).equals(irc_prefix))
                && (!irc_input_cmd.isEmpty())) {
             // Parse codes only from valid server
+            irc_input_key = "";
             try {
               irc_input_key = this.irc_codes.get(irc_input_cmd);
+              if (irc_input_key == null) irc_input_key = "";
             } catch(Exception my_ex) {
               irc_input_key = ""; // Unknwon IRC code
             };
             if (irc_input_key.isEmpty()) {
               try {
                 irc_input_key = this.irc_commands.get(irc_input_cmd);
+                if (irc_input_key == null) irc_input_key = "";
               } catch (Exception my_ex) {
                 irc_input_key = ""; // Unknwon IRC command
               };
@@ -1771,6 +1824,8 @@ public class jlayerirc implements Runnable {
               //
 
               irc_message = this.irc_extract_message_(irc_input_split);
+
+              System.out.println("irc_message = [" + irc_message + "]");
 
               if ((irc_message == null)
                && (irc_input_buffer.toString().isEmpty())) {
