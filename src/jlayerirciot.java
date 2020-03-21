@@ -58,7 +58,7 @@ public class jlayerirciot {
    //
    private static final long serialVersionUID = 32767;
    //
-   public String irciot_library_version = "0.0.187";
+   public String irciot_library_version = "0.0.188";
    //
    public String irciot_protocol_version = "0.3.31";
    //
@@ -869,16 +869,67 @@ public class jlayerirciot {
   // End of irciot_encap_internal_()
 
   // incomplete
-  // public List<Pair<String, String>> irciot_encap_all_() {
-    //
+  public void irciot_blockchain_check_publication_() {
 
-    // List<Pair<String, String>> my_out = new ArrayList<>();
+  };
 
-    // my_out.add(Pair.with("", ""));
-    // return my_out;
-  // };
+  // incomplete
+  public void irciot_encryption_check_publication_() {
 
-  public Triplet<String, Integer, Integer> irciot_encap_(String in_datumset, int in_skip, int in_part) {
+  };
+
+  // incomplete
+  public List<Pair<String, String>> irciot_encap_all_(String in_datumset, String in_vuid) {
+    List<Pair<String, String>> my_out = new ArrayList<>();
+    if (in_vuid == null) return my_out;
+    if (in_vuid.isEmpty()
+     || in_vuid.charAt(0) == CONST.api_vuid_all
+     || in_vuid.charAt(0) == CONST.api_vuid_cfg
+     || in_vuid.charAt(0) == CONST.api_vuid_tmp) {
+      this.irciot_blockchain_check_publication_();
+      this.irciot_encryption_check_publication_();
+    };
+    Triplet<String, Integer, Integer> my_encap;
+    String json_text = "";
+    int my_skip = 0;
+    int my_part = 0;
+    if (this.crypt_model == CONST.crypt_NO_ENCRYPTION) {
+      if (!in_vuid.isEmpty()) {
+        if (in_vuid.charAt(0) == CONST.api_vuid_all) {
+          List<Pair<String, String>> my_inside
+            = this.irciot_encap_all_(in_datumset, "");
+          Iterator<Pair<String, String>> my_iterator = my_inside.iterator();
+          while (my_iterator.hasNext()) {
+            Pair<String, String> my_item = my_iterator.next();
+            json_text = my_item.getValue0();
+            my_out.add(Pair.with(json_text, in_vuid));
+          };
+          return my_out;
+        };
+      };
+      // If the message is to be encrypted with end-to-end encryption
+      // then it is need to create a separate message for each VUID
+      // Also, the same when no encryption but type of VUID is defined
+
+      //
+    };
+    my_encap = this.irciot_encap_(in_datumset, 0, 0, in_vuid);
+    json_text = my_encap.getValue0();
+    my_skip = my_encap.getValue1();
+    my_part = my_encap.getValue2();
+    if (!json_text.isEmpty()) my_out.add(Pair.with(json_text, in_vuid));
+    while (my_skip > 0 || my_part > 0) {
+      my_encap = this.irciot_encap_(in_datumset, my_skip, my_part, in_vuid);
+      json_text = my_encap.getValue0();
+      my_skip = my_encap.getValue1();
+      my_part = my_encap.getValue2();
+      if (!json_text.isEmpty()) my_out.add(Pair.with(json_text, in_vuid));
+    };
+    return my_out;
+  };
+
+  public Triplet<String, Integer, Integer> irciot_encap_(String in_datumset,
+   int in_skip, int in_part, String in_vuid) {
     String my_irciot = "";
     String my_datumset = in_datumset;
     boolean my_encrypt = false;
