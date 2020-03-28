@@ -870,13 +870,54 @@ public class jlayerirciot {
 
   // incomplete
   public void irciot_blockchain_check_publication_() {
+    if (this.blockchain_key_published > 0) return;
+    if (this.mid_method != CONST.tag_mid_ED25519
+     && this.mid_method != CONST.tag_mid_RSA1024
+     && this.mid_method != CONST.tag_mid_GOST12) return;
+    this.blockchain_key_published = CONST.BCHT;
+    // this.irciot_blockchain_key_publication_(
+    //   this.blockchain_public_key, CONST.ot_BCH_INFO
+    // );
 
   };
 
   // incomplete
   public void irciot_encryption_check_publication_() {
+    if (this.encryption_key_published > 0) return;
+    if (this.crypt_model != CONST.crypt_ASYMMETRIC) return;
+    this.encryption_key_published = CONST.ENCT;
+    // self.irciot_encryption_key_publication_(
+    //   this.encryption_public_key, CONST.ot_ENC_INFO
+    // );
 
   };
+
+  // incomplete
+  public void irciot_blockchain_place_key_to_repo_(String in_public_key) {
+    if (in_public_key == null) return;
+
+  };
+
+  // incomplete
+  public void irciot_encryption_place_key_to_repo_(String in_public_key) {
+    if (in_public_key == null) return;
+
+  };
+
+  // incomplete
+  public void irciot_blockchain_request_foreign_key_(String in_vuid) {
+    // IRC-IoT messages of this type should be sent directly
+    // to the user using private sending, but now they are passed
+    // to the common message flow and appear in the channel
+
+  };
+  // End of irciot_blockchain_request_foreign_key_()
+
+  // incomplete
+  public void irciot_encryption_request_foreign_key_(String in_vuid) {
+
+  };
+  // End of irciot_encryption_request_foreign_key_()
 
   // incomplete
   public List<Pair<String, String>> irciot_encap_all_(String in_datumset, String in_vuid) {
