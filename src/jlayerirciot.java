@@ -409,6 +409,7 @@ public class jlayerirciot {
    public int err_DEFRAG_DC_EXCEEDED  = 122;
    public int err_DEFRAG_BC_EXCEEDED  = 123;
    public int err_OVERLAP_MISSMATCH   = 131;
+   public int err_DEFRAG_MISSMATCH    = 133;
    public int err_BASE64_DECODING     = 251;
    public int err_BASE32_DECODING     = 252;
    public int err_BASE85_DECODING     = 253;
@@ -444,6 +445,7 @@ public class jlayerirciot {
      put( err_DEFRAG_DC_EXCEEDED, "Exceeded 'dc' field value" );
      put( err_DEFRAG_BC_EXCEEDED, "Exceeded 'bc' field value" );
      put( err_OVERLAP_MISSMATCH,  "Overlapping fragments missmatch" );
+     put( err_DEFRAG_MISSMATCH,   "Defragmentation content missmatch" );
      put( err_COMP_ZLIB_HEADER,   "Invalid Zlib header" );
      put( err_COMP_ZLIB_INCOMP,   "Zlib incomplete block" );
      put( err_INVALID_MESSAGE,    "Invalid IRC-IoT message format" );
@@ -531,8 +533,10 @@ public class jlayerirciot {
   public int oid_lock = 0;
   public int did_lock = 0;
   //
+  public List<Triplet<String, Object, String>> defrag_pool;
   public boolean defrag_lock = false;
   //
+  public List<Pair<String, String>> output_pool;
   public boolean output_lock = false;
   //
   public String  ldict_file  = null;
@@ -611,6 +615,37 @@ public class jlayerirciot {
     return String.format("%08x", my_crc.getValue());
   };
 
+  public void irciot_clear_defrag_chain_(Integer in_did) {
+    if (in_did == null) return;
+    if (this.defrag_lock) return;
+    this.defrag_lock = true;
+    try {
+      Iterator<Triplet<String, Object, String>> my_iterator
+        = this.defrag_pool.iterator();
+      while (my_iterator.hasNext()) {
+        Triplet<String, Object, String> my_item = my_iterator.next();
+        Ennead<String, String, String, String,
+         Integer, Integer, Integer, Integer, Integer> my_header
+          = (Ennead<String, String, String, String,
+         Integer, Integer, Integer, Integer, Integer>) my_item.getValue1();
+        int my_did = my_header.getValue8();
+        if (my_did == in_did) {
+          this.defrag_pool.remove(my_item);
+          break;
+        };
+      };
+    } catch (Exception my_ex) {};
+    this.defrag_lock = false;
+  };
+  // End of irciot_clear_defrag_chain_()
+
+  public String irciot_add_padding_(String in_buffer, Integer in_padding) {
+   int my_count = in_padding - (in_buffer.length() % in_padding);
+   if (my_count > 0)
+     for (int my_idx = 0;my_idx < my_count;my_idx++) in_buffer += '=';
+   return in_buffer;
+  };
+
   // incomplete
   public String irciot_defragmentation_(String in_enc,
     Ennead<String, String, String, String, Integer, Integer, Integer, Integer, Integer> in_header,
@@ -629,6 +664,66 @@ public class jlayerirciot {
     int my_err = 0;
     int my_ok  = 0;
     boolean my_fragments = false;
+    String defrag_buffer = "";
+    Pair<String, String>[] defrag_array;
+    Iterator<Triplet<String, Object, String>> my_iterator
+      = this.defrag_pool.iterator();
+    while (my_iterator.hasNext()) {
+      Triplet<String, Object, String> my_item = my_iterator.next();
+      String test_enc = my_item.getValue0();
+      String test_json = my_item.getValue2();
+      Ennead<String, String, String, String,
+       Integer, Integer, Integer, Integer, Integer> my_header
+        = (Ennead<String, String, String, String,
+       Integer, Integer, Integer, Integer, Integer>) my_item.getValue1();
+      String test_dt  = my_header.getValue0();
+      String test_ot  = my_header.getValue1();
+      String test_src = my_header.getValue2();
+      String test_dst = my_header.getValue3();
+      Integer test_dc  = my_header.getValue4();
+      Integer test_dp  = my_header.getValue5();
+      Integer test_bc  = my_header.getValue6();
+      Integer test_bp  = my_header.getValue7();
+      Integer test_did = my_header.getValue8();
+      if (orig_json.equals(test_json)) {
+        my_dup = true;
+        break;
+      } else {
+        if (test_did == my_did) {
+          my_fragments = true;
+          if (my_ot.equals(test_ot) &&
+              my_src.equals(test_src) &&
+              my_dst.equals(test_dst)) {
+            if ((test_dc == my_dc) &&
+                (test_dp == my_dp) &&
+                (test_bp == my_bp) &&
+                (test_bc == my_bc)) {
+                  boolean my_enc_ok = false;
+                  if (in_enc != null)
+                    if (in_enc.equals(test_enc)) {
+                      my_dup = true;
+                      my_enc_ok = true;
+                    };
+                  if (!my_enc_ok) {
+                    my_err = CONST.err_DEFRAG_MISSMATCH;
+                    break;
+                  };
+                };
+                //
+
+            //
+
+          };
+          //
+
+        };
+        //
+
+      };
+      //
+
+    }
+    //
 
     return "";
   };
