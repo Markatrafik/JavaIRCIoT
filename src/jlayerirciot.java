@@ -578,6 +578,18 @@ public class jlayerirciot {
   public Pair<String, String> irciot_compatibility_() {
     return Pair.with(CONST.irciot_protocol_version, CONST.irciot_library_version);
   };
+
+  // incomplete
+  public void irciot_error_(int in_error_code, String in_mid,
+   String in_vuid, String in_addon) {
+    // Warning: This version of error handler is made for
+    // testing and does not comply with the specification
+    String my_message = "";
+    //
+
+
+    //
+  };
   //
 
   public void irciot_crc16_init_() {
@@ -665,7 +677,7 @@ public class jlayerirciot {
     int my_ok  = 0;
     boolean my_fragments = false;
     String defrag_buffer = "";
-    Pair<String, String>[] defrag_array;
+    List<Pair<Integer, String>> defrag_array = new ArrayList<>();
     Iterator<Triplet<String, Object, String>> my_iterator
       = this.defrag_pool.iterator();
     while (my_iterator.hasNext()) {
@@ -694,10 +706,10 @@ public class jlayerirciot {
           if (my_ot.equals(test_ot) &&
               my_src.equals(test_src) &&
               my_dst.equals(test_dst)) {
-            if ((test_dc == my_dc) &&
-                (test_dp == my_dp) &&
-                (test_bp == my_bp) &&
-                (test_bc == my_bc)) {
+            if ((test_dc == my_dc)
+             && (test_dp == my_dp)
+             && (test_bp == my_bp)
+             && (test_bc == my_bc)) {
                   boolean my_enc_ok = false;
                   if (in_enc != null)
                     if (in_enc.equals(test_enc)) {
@@ -708,11 +720,63 @@ public class jlayerirciot {
                     my_err = CONST.err_DEFRAG_MISSMATCH;
                     break;
                   };
+            } else {
+              if ((test_dc != -1)
+               && (test_dp != -1)
+               && (test_bc == -1)
+               && (test_bp == -1)) {
+                if (my_dp == -1) {
+                  my_err = CONST.err_DEFRAG_DP_MISSING;
+                  break;
                 };
-                //
+                Pair<Integer, String> defrag_item;
+                if (defrag_array.size() == 0)
+                  defrag_array.add(Pair.with(my_dp, in_enc));
+                defrag_array.add(Pair.with(test_dp, test_enc));
+                if (defrag_array.size() == my_dc) {
+                  my_ok = 1;
+                  break;
+                } else if (defrag_array.size() > my_dc) {
+                  my_err = CONST.err_DEFRAG_DC_EXCEEDED;
+                  break;
+                };
+              } else
+                 if ((test_bc != -1)
+                  && (test_bp != -1)
+                  && (test_dc != -1)
+                  && (test_dp != -1)) {
+                   if (my_bp == -1) {
+                     my_err = CONST.err_DEFRAG_BP_MISSING;
+                     break;
+                   };
+                   if (defrag_buffer.isEmpty()) {
+                     for (int my_idx = 0;my_idx < my_bc;my_idx++)
+                       defrag_buffer += CONST.pattern;
+                     //
 
-            //
+                   };
+                   if (!defrag_buffer.isEmpty()) {
+                     // here will be a comparison of overlapping buffer intervals
+                     //
 
+                     int my_count = 0;
+                     for (int my_idx = 0;my_idx < my_bc;my_idx++)
+                       if (defrag_buffer.charAt(my_idx) == CONST.pattern) my_count++;
+                     if (my_count == 0) {
+                       my_ok = 2;
+                     } else {
+                       my_new = true;
+                     };
+                   };
+                   //
+
+                 } else {
+                   // Combo fragmentation method
+                 };
+            };
+          } else {
+            my_err = CONST.err_DEFRAG_INVALID_DID;
+            break;
           };
           //
 
@@ -722,9 +786,76 @@ public class jlayerirciot {
       };
       //
 
-    }
-    //
+    };
+    if (this.defrag_pool.size() == 0) {
+      if (in_enc.length() == my_dc) {
+        defrag_buffer = in_enc;
+        my_ok = 2;
+      } else my_new = true;
+    } else if (!my_fragments) my_new = true;
+    if (my_err > 0) {
+      this.irciot_error_(my_err, null, null, null);
+      this.irciot_clear_defrag_chain_(my_did);
+      return "";
+    };
+    if (my_new) {
+      this.defrag_lock = true;
+      this.defrag_pool.add(Triplet.with(in_enc, in_header, orig_json));
+      this.defrag_lock = false;
+    };
+    if (my_ok > 0) {
+      if (my_ok == 1) {
+      } else if (my_ok == 2) {
+        this.irciot_clear_defrag_chain_(my_did);
+        if (CAN_debug_library)
+          System.out.println("\033[1;42m DEFRAGMENTATION COMPLETED \033[0m");
+        String my_crypt_method = this.crypt_method;
+        if (CONST.ot_ENC_INFO.equals(my_ot)
+         || CONST.ot_ENC_ACK.equals(my_ot)
+         || CONST.ot_BCH_INFO.equals(my_ot)
+         || CONST.ot_BCH_ACK.equals(my_ot)
+         || CONST.ot_ENC_REQUEST.equals(my_ot)
+         || CONST.ot_BCH_REQUEST.equals(my_ot))
+          my_crypt_method = this.irciot_crypto_wo_encryption_(this.crypt_method);
+        int my_base = this.irciot_crypto_get_base_(my_crypt_method);
+        if (my_base == CONST.base_BASE64) {
 
+        } else if (my_base == CONST.base_BASE85) {
+
+        } else if (my_base == CONST.base_BASE32) {
+
+        } else {
+          //
+
+        };
+        int my_algo = this.irciot_crypto_get_algorithm_(my_crypt_method);
+        if (my_algo == CONST.crypto_RSA) {
+
+        } else if (my_algo == CONST.crypto_AES) {
+
+        } else if (my_algo == CONST.crypto_2FISH) {
+
+        };
+        int my_compress = this.irciot_crypto_get_compress_(my_crypt_method);
+        if (my_compress == CONST.compress_NONE) {
+
+        } else if (my_compress == CONST.compress_ZLIB) {
+
+        } else if (my_compress == CONST.compress_BZIP2) {
+
+        } else return "";
+        try {
+          // Adding missing fields to the "Datum" from parent object
+
+          //
+        } catch (Exception my_ex) {
+          return "";
+        };
+      } else return "";
+      this.irciot_clear_defrag_chain_(my_did);
+      return "";
+    };
+    if (my_dup) return "";
     return "";
   };
   // End of irciot_defragmentation_()
