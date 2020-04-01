@@ -552,6 +552,13 @@ public class jlayerirciot {
   public int crypt_base = this.irciot_crypto_get_base_(crypt_method);
   public int crypt_compress = this.irciot_crypto_get_compress_(crypt_method);
   //
+  public Object crypt_RSA  = (Object) null;
+  public Object crypt_AES  = (Object) null;
+  public Object crypt_FISH = (Object) null;
+  // Compression modules:
+  public Object crypt_ZLIB = (Object) null;
+  public Object crypt_BZ2  = (Object) null;
+  //
   public int blockchain_key_published = 0;
   //
   public int encryption_key_published = 0;
@@ -860,6 +867,16 @@ public class jlayerirciot {
   };
   // End of irciot_defragmentation_()
 
+  public void irciot_load_encryption_methods_(String in_crypt_method) {
+
+  };
+  // End of irciot_load_encryption_methods_()
+
+  public void irciot_load_compression_methods_(String in_compress_method) {
+
+  };
+  // End of irciot_load_compression_methods_()
+
   public String irciot_decrypt_datum_(JSONObject in_datum,
     Sextet<String, String, String, String, Integer, Integer> in_header,
     String orig_json, String in_vuid) {
@@ -1091,6 +1108,20 @@ public class jlayerirciot {
     }; // while my_iterator
     if (big_ot == null)
       return Pair.with("", 0);
+    String str_big_datum = big_datum.toJSONString();
+    if (this.crypt_compress == CONST.compress_ZLIB) {
+      if (jlayerirciot.DO_auto_compress && this.crypt_ZLIB == null) {};
+        this.irciot_load_compression_methods_(this.crypt_method);
+      if (this.crypt_ZLIB == null) return Pair.with("", 0);
+
+    } else if (this.crypt_compress == CONST.compress_BZIP2) {
+      //
+
+    } else if (this.crypt_compress == CONST.compress_NONE) {
+      //
+
+    } else return Pair.with("", 0);
+    //
 
     return Pair.with("", 0);
   };
@@ -1098,7 +1129,7 @@ public class jlayerirciot {
 
   // incomplete
   public List<String> irciot_get_vuid_list_(String in_vuid) {
-    List<String> my_vuid_list = null;
+    List<String> my_vuid_list = new ArrayList<>();;
 
     return my_vuid_list;
   };
@@ -1170,7 +1201,6 @@ public class jlayerirciot {
   };
   // End of irciot_encryption_request_foreign_key_()
 
-  // incomplete
   public List<Pair<String, String>> irciot_encap_all_(String in_datumset, String in_vuid) {
     List<Pair<String, String>> my_out = new ArrayList<>();
     if (in_vuid == null) return my_out;
@@ -1203,8 +1233,16 @@ public class jlayerirciot {
       // then it is need to create a separate message for each VUID
       // Also, the same when no encryption but type of VUID is defined
       List<String> my_vuid_list = this.irciot_get_vuid_list_(in_vuid);
-      //
-
+      if (my_vuid_list.size() == 0) return my_out;
+      Iterator<String> my_iterator = my_vuid_list.iterator();
+      while (my_iterator.hasNext()) {
+        String my_vuid = my_iterator.next();
+        if (in_vuid.equals(CONST.api_vuid_cfg)
+         || in_vuid.equals(CONST.api_vuid_tmp))
+          if (my_vuid.charAt(0) == in_vuid.charAt(0)) continue;
+        my_out.addAll(this.irciot_encap_all_(in_datumset, my_vuid));
+      };
+      return my_out;
     };
     my_encap = this.irciot_encap_(in_datumset, 0, 0, in_vuid);
     json_text = my_encap.getValue0();
@@ -1220,6 +1258,7 @@ public class jlayerirciot {
     };
     return my_out;
   };
+  // End of irciot_encap_all_()
 
   public Triplet<String, Integer, Integer> irciot_encap_(String in_datumset,
    int in_skip, int in_part, String in_vuid) {
