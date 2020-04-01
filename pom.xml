@@ -2,7 +2,7 @@
  <modelVersion>4.0.0</modelVersion>
  <groupId>javairciot</groupId>
  <artifactId>javairciot</artifactId>
- <version>0.0.188</version>
+ <version>0.0.189</version>
  <packaging>jar</packaging>
  <scm>
      <connection>scm:git:https://github.com/Markatrafik/JavaIRCIoT.git</connection>

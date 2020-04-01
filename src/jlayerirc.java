@@ -59,9 +59,9 @@ public class jlayerirc implements Runnable {
 
   public static final class init_constants {
    //
-   public String irciot_library_version = "0.0.188";
+   public String irciot_library_version = "0.0.189";
    //
-   public String irciot_protocol_version = "0.3.31";
+   public String irciot_protocol_version = "0.3.33";
    //
    private static final long serialVersionUID = 32765;
    //

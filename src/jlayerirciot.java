@@ -58,9 +58,9 @@ public class jlayerirciot {
    //
    private static final long serialVersionUID = 32767;
    //
-   public String irciot_library_version = "0.0.188";
+   public String irciot_library_version = "0.0.189";
    //
-   public String irciot_protocol_version = "0.3.31";
+   public String irciot_protocol_version = "0.3.33";
    //
    // IRC-IoT characters:
    //
@@ -1070,13 +1070,38 @@ public class jlayerirciot {
   public Pair<String, Integer> irciot_encap_bigdatum_(JSONArray in_datums, int in_part) {
     String save_mid = this.current_mid;
     String big_ot = (String) null;
-
+    JSONArray my_datums = in_datums;
+    Iterator<?> my_iterator = my_datums.iterator();
+    JSONObject big_datum = new JSONObject();
+    int my_datums_cnt = 0;
+    while (my_iterator.hasNext()) {
+      Object my_datum_obj = (Object) my_iterator.next();
+      JSONObject my_datum = (JSONObject) null;
+      if (my_datum_obj instanceof JSONObject) {
+        my_datum = (JSONObject) my_datum_obj;
+        if ((my_datums_cnt == 0) && (my_datum != null)) {
+          big_datum = my_datum;
+          Object my_object = my_datum.get(CONST.tag_OBJECT_TYPE);
+          if (my_object instanceof String)
+            big_ot = (String) my_object;
+          in_datums.remove(my_datums_cnt);
+        };
+      };
+      my_datums_cnt += 1;
+    }; // while my_iterator
     if (big_ot == null)
       return Pair.with("", 0);
 
     return Pair.with("", 0);
   };
   // End of irciot_encap_bigdatum_()
+
+  // incomplete
+  public List<String> irciot_get_vuid_list_(String in_vuid) {
+    List<String> my_vuid_list = null;
+
+    return my_vuid_list;
+  };
 
   // incomplete
   public String irciot_encap_internal_(String in_datumset) {
@@ -1177,8 +1202,9 @@ public class jlayerirciot {
       // If the message is to be encrypted with end-to-end encryption
       // then it is need to create a separate message for each VUID
       // Also, the same when no encryption but type of VUID is defined
-
+      List<String> my_vuid_list = this.irciot_get_vuid_list_(in_vuid);
       //
+
     };
     my_encap = this.irciot_encap_(in_datumset, 0, 0, in_vuid);
     json_text = my_encap.getValue0();
