@@ -16,6 +16,7 @@ package javairciot;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Iterator;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
+import java.text.SimpleDateFormat;
 import org.javatuples.Pair;
 import org.javatuples.Sextet;
 import org.javatuples.Triplet;
@@ -58,7 +60,7 @@ public class jlayerirciot {
    //
    private static final long serialVersionUID = 32767;
    //
-   public String irciot_library_version = "0.0.189";
+   public String irciot_library_version = "0.0.191";
    //
    public String irciot_protocol_version = "0.3.33";
    //
@@ -70,6 +72,8 @@ public class jlayerirciot {
    public String irciot_chars_addon = "-_.";
    public String irciot_chars_addr_cell = irciot_chars_lower
      + irciot_chars_upper + irciot_chars_digit + irciot_chars_addon;
+   //
+   public String irciot_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSSSS";
    //
    // IRC-IoT TAGs
    //
@@ -569,8 +573,10 @@ public class jlayerirciot {
   //
   public short[] crc16_table;
   //
+  public Random random;
+  //
   public jlayerirciot() { // Class constructor
-    //
+    this.random = new Random();
 
   };
 
@@ -617,6 +623,13 @@ public class jlayerirciot {
     this.crc16_table = my_table;
   };
 
+  public String irciot_get_current_datetime_() {
+    Calendar my_cal = Calendar.getInstance();
+    SimpleDateFormat my_sdf
+      = new SimpleDateFormat(CONST.irciot_DATE_FORMAT);
+    return my_sdf.format(my_cal.getTime());
+  };
+
   public void irciot_crc32_init_() {
   };
 
@@ -626,7 +639,7 @@ public class jlayerirciot {
     for (byte my_chr : in_bytes)
       my_crc = ((my_crc >> 8) ^ (this.crc16_table[((my_crc ^ my_chr) & 0xFF)]) & 0xFFFF);
     return String.format("%04x", my_crc & 0xFFFF);
-  }
+  };
 
   public String irciot_crc32_(byte[] in_bytes) {
     Checksum my_crc = new CRC32();
@@ -1164,6 +1177,76 @@ public class jlayerirciot {
   };
 
   // incomplete
+  public List<Pair<String, String>>
+    irciot_blockchain_request_to_messages_(String in_vuid) {
+    JSONObject my_datum = new JSONObject();
+    my_datum.put(CONST.tag_OBJECT_TYPE, CONST.ot_BCH_REQUEST);
+    my_datum.put(CONST.tag_DATUM_ID, this.random.nextInt(899) + 100);
+    my_datum.put(CONST.tag_BCH_METHOD, this.mid_method);
+
+    my_datum.put(CONST.tag_SRC_ADDR, "");
+    my_datum.put(CONST.tag_DST_ADDR, "");
+    // Copy destination address from last message source address?!
+    my_datum.put(CONST.tag_DATE_TIME,
+      this.irciot_get_current_datetime_());
+    return this.irciot_encap_all_(my_datum, in_vuid);
+  };
+  // End of irciot_blockchain_request_to_message_()
+
+  // incomplete
+  public List<Pair<String, String>>
+    irciot_encryption_request_to_messages_(String in_vuid) {
+    JSONObject my_datum = new JSONObject();
+    my_datum.put(CONST.tag_OBJECT_TYPE, CONST.ot_ENC_REQUEST);
+    my_datum.put(CONST.tag_DATUM_ID, this.random.nextInt(899) + 100);
+    my_datum.put(CONST.tag_ENC_METHOD, this.crypt_method);
+
+    my_datum.put(CONST.tag_SRC_ADDR, "");
+    my_datum.put(CONST.tag_DST_ADDR, "");
+    // Copy destination address from last message source address?!
+    my_datum.put(CONST.tag_DATE_TIME,
+      this.irciot_get_current_datetime_());
+    return this.irciot_encap_all_(my_datum, in_vuid);
+  };
+  // End of irciot_encryption_request_to_message_()
+
+  // incomplete
+  public List<Pair<String, String>>
+    irciot_blockchain_key_to_messages_(String in_key_string,
+      String in_ot, String in_vuid) {
+
+    JSONObject my_datum = new JSONObject();
+    my_datum.put(CONST.tag_OBJECT_TYPE, in_ot);
+    my_datum.put(CONST.tag_DATUM_ID, this.random.nextInt(899) + 100);
+    my_datum.put(CONST.tag_BCH_METHOD, this.mid_method);
+    my_datum.put(CONST.tag_BCH_PUBKEY, in_key_string);
+    my_datum.put(CONST.tag_SRC_ADDR, "");
+    my_datum.put(CONST.tag_DST_ADDR, "");
+    my_datum.put(CONST.tag_DATE_TIME,
+      this.irciot_get_current_datetime_());
+    return this.irciot_encap_all_(my_datum, in_vuid);
+  };
+  // End of irciot_blockcahin_key_to_message_()
+
+  // incomplete
+  public List<Pair<String, String>>
+    irciot_encryption_key_to_messages_(String in_key_string,
+      String in_ot, String in_vuid) {
+
+    JSONObject my_datum = new JSONObject();
+    my_datum.put(CONST.tag_OBJECT_TYPE, in_ot);
+    my_datum.put(CONST.tag_DATUM_ID, this.random.nextInt(899) + 100);
+    my_datum.put(CONST.tag_ENC_METHOD, this.crypt_method);
+    my_datum.put(CONST.tag_ENC_PUBKEY, in_key_string);
+    my_datum.put(CONST.tag_SRC_ADDR, "");
+    my_datum.put(CONST.tag_DST_ADDR, "");
+    my_datum.put(CONST.tag_DATE_TIME,
+      this.irciot_get_current_datetime_());
+    return this.irciot_encap_all_(my_datum, in_vuid);
+  };
+  // End of irciot_encryption_key_to_messages
+
+  // incomplete
   public void irciot_encryption_check_publication_() {
     if (this.encryption_key_published > 0) return;
     if (this.crypt_model != CONST.crypt_ASYMMETRIC) return;
@@ -1201,7 +1284,8 @@ public class jlayerirciot {
   };
   // End of irciot_encryption_request_foreign_key_()
 
-  public List<Pair<String, String>> irciot_encap_all_(String in_datumset, String in_vuid) {
+  public List<Pair<String, String>>
+   irciot_encap_all_(JSONObject in_datumset, String in_vuid) {
     List<Pair<String, String>> my_out = new ArrayList<>();
     if (in_vuid == null) return my_out;
     if (in_vuid.isEmpty()
@@ -1244,13 +1328,14 @@ public class jlayerirciot {
       };
       return my_out;
     };
-    my_encap = this.irciot_encap_(in_datumset, 0, 0, in_vuid);
+    String my_datumset_str = in_datumset.toString();
+    my_encap = this.irciot_encap_(my_datumset_str, 0, 0, in_vuid);
     json_text = my_encap.getValue0();
     my_skip = my_encap.getValue1();
     my_part = my_encap.getValue2();
     if (!json_text.isEmpty()) my_out.add(Pair.with(json_text, in_vuid));
     while (my_skip > 0 || my_part > 0) {
-      my_encap = this.irciot_encap_(in_datumset, my_skip, my_part, in_vuid);
+      my_encap = this.irciot_encap_(my_datumset_str, my_skip, my_part, in_vuid);
       json_text = my_encap.getValue0();
       my_skip = my_encap.getValue1();
       my_part = my_encap.getValue2();

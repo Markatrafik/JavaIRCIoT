@@ -59,7 +59,7 @@ public class jlayerirc implements Runnable {
 
   public static final class init_constants {
    //
-   public String irciot_library_version = "0.0.189";
+   public String irciot_library_version = "0.0.191";
    //
    public String irciot_protocol_version = "0.3.33";
    //
@@ -809,6 +809,7 @@ public class jlayerirc implements Runnable {
   // incomplete
   public void start_ident_() {
    this.ident_run = true;
+
   };
 
   // incomplete
@@ -871,11 +872,16 @@ public class jlayerirc implements Runnable {
     } else this.irc_track_update_nick_(in_nick, in_mask, in_vuid, in_info);
   };
 
-  // incomplete
   public Quartet<String, String, String, String>
     irc_track_get_nick_struct_by_nick_(String in_nick) {
-
-    return Quartet.with("", "", "", "");
+    if ((this.is_irc_nick_(in_nick)) && (this.irc_nicks != null))
+      for (int my_idx = 0;my_idx < this.irc_nicks.length;my_idx++) {
+        Quartet<String, String, String, String> my_struct
+          = this.irc_nicks[ my_idx ];
+        if (in_nick.equals(my_struct.getValue0()))
+          return my_struct;
+      };
+    return (Quartet<String, String, String, String>) null;
   };
 
   // incomplete
