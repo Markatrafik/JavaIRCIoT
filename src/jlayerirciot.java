@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import java.text.SimpleDateFormat;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base32;
 import org.javatuples.Pair;
 import org.javatuples.Sextet;
 import org.javatuples.Triplet;
@@ -671,6 +673,25 @@ public class jlayerirciot {
   };
   // End of irciot_clear_defrag_chain_()
 
+  public String irciot_base64_decode_(String in_string) {
+    byte[] my_arr = Base64.decodeBase64(in_string.getBytes());
+    String my_str = new String(my_arr);
+    return my_str;
+  };
+
+  // incomplete
+  public String irciot_base85_decode_(String in_string) {
+
+    return "";
+  };
+
+  public String irciot_base32_decode_(String in_string) {
+    Base32 base32 = new Base32();
+    byte[] my_arr = base32.decode(in_string.getBytes());
+    String my_str = new String(my_arr);
+    return my_str;
+  };
+
   public String irciot_add_padding_(String in_buffer, Integer in_padding) {
    int my_count = in_padding - (in_buffer.length() % in_padding);
    if (my_count > 0)
@@ -784,12 +805,8 @@ public class jlayerirciot {
                        if (defrag_buffer.charAt(my_idx) == CONST.pattern) my_count++;
                      if (my_count == 0) {
                        my_ok = 2;
-                     } else {
-                       my_new = true;
-                     };
+                     } else my_new = true;
                    };
-                   //
-
                  } else {
                    // Combo fragmentation method
                  };
@@ -798,14 +815,8 @@ public class jlayerirciot {
             my_err = CONST.err_DEFRAG_INVALID_DID;
             break;
           };
-          //
-
         };
-        //
-
       };
-      //
-
     };
     if (this.defrag_pool.size() == 0) {
       if (in_enc.length() == my_dc) {
@@ -838,12 +849,30 @@ public class jlayerirciot {
          || CONST.ot_BCH_REQUEST.equals(my_ot))
           my_crypt_method = this.irciot_crypto_wo_encryption_(this.crypt_method);
         int my_base = this.irciot_crypto_get_base_(my_crypt_method);
+        String out_base = new String("");
         if (my_base == CONST.base_BASE64) {
-
+          try {
+            defrag_buffer = this.irciot_add_padding_(defrag_buffer, 4);
+            out_base = this.irciot_base64_decode_(defrag_buffer);
+          } catch (Exception my_ex) {
+            this.irciot_error_(CONST.err_BASE64_DECODING, null, null, null);
+            return "";
+          };
         } else if (my_base == CONST.base_BASE85) {
-
+          try {
+            out_base = this.irciot_base85_decode_(defrag_buffer);
+          } catch (Exception my_ex) {
+            this.irciot_error_(CONST.err_BASE64_DECODING, null, null, null);
+            return "";
+          };
         } else if (my_base == CONST.base_BASE32) {
-
+          try {
+            defrag_buffer = this.irciot_add_padding_(defrag_buffer, 8);
+            out_base = this.irciot_base32_decode_(defrag_buffer);
+          } catch (Exception my_ex) {
+            this.irciot_error_(CONST.err_BASE32_DECODING, null, null, null);
+            return "";
+          };
         } else {
           //
 

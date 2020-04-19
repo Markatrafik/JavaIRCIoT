@@ -14,11 +14,15 @@ export CLASSPATH="${CLASSPATH}:/usr/share/java/json-simple-1.1.1.jar"
 #export CLASSPATH="${CLASSPATH}:/usr/share/java/json-lib.jar"
 #export CLASSPATH="${CLASSPATH}:/usr/share/groovy/lib/groovy-json.jar"
 export CLASSPATH="${CLASSPATH}:/usr/share/java/javatuples.jar"
+export CLASSPATH="${CLASSPATH}:/usr/share/java/commons-codec.jar"
 export BOOT_CLASSPATH="${CLASSPATH}"
 export PASE_DEFAULT_UTF8=Y
-export DEBIAN_PACKAGES="libjavatuples-java libjson-simple-java maven"
+export DEBIAN_PACKAGES="libjavatuples-java libjson-simple-java"
+export DEBIAN_PACKAGES="${DEBIAN_PACKAGES} libcommons-codec-java"
+export DEBIAN_PACKAGES="${DEBIAN_PACKAGES} maven"
 export COMPILE_ARGS="-Xdiags:verbose"
 export COMPILE_ARGS="${COMPILE_ARGS} -Xlint" # Warnings
+#export MAVEN_ARGS="-X" # Maven detailed Warnings
 export MAVEN_ARGS="-DsourceEncoding=UTF-8 -Dfile.encoding=UTF-8"
 export MAVEN_ARGS="${MAVEN_ARGS} -DdefaultCharacterEncoding=UTF-8"
 #export GRADLE_ARGS="${GRADLE_ARGS} --warning-mode all" # Warnings
