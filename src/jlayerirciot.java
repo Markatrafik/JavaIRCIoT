@@ -28,6 +28,7 @@ import java.util.zip.Checksum;
 import java.text.SimpleDateFormat;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base32;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.javatuples.Pair;
 import org.javatuples.Sextet;
 import org.javatuples.Triplet;
@@ -909,15 +910,83 @@ public class jlayerirciot {
   };
   // End of irciot_defragmentation_()
 
-  public void irciot_load_encryption_methods_(String in_crypt_method) {
+  // incomplete
+  boolean irciot_load_blockchain_methods_(String in_mid_method) {
 
+    return false;
+  };
+  // End of irciot_load_blockchain_methods_()
+
+  // incomplete
+  boolean irciot_load_encryption_methods_(String in_crypt_method) {
+
+    return false;
   };
   // End of irciot_load_encryption_methods_()
 
-  public void irciot_load_compression_methods_(String in_compress_method) {
+  // incomplete
+  boolean irciot_load_compression_methods_(String in_compress_method) {
 
+    return false;
   };
   // End of irciot_load_compression_methods_()
+
+  public void irciot_init_blockchain_method_(String in_mid_method) {
+
+  };
+  // End of irciot_init_blocchain_method_()
+
+  // incomplete
+  public void irciot_enable_blockchain_(String in_mid_method) {
+    if (!this.irciot_load_blockchain_methods_(in_mid_method))
+      this.irciot_init_blockchain_method_(in_mid_method);
+    this.mid_method = in_mid_method;
+    this.blockchain_key_published = 0;
+  };
+
+  // incomplete
+  public void irciot_enable_encryption_(String in_crypt_method) {
+
+  };
+
+  // incomplete
+  public void irciot_disable_blockchain_() {
+  };
+
+  // incomplete
+  public void irciot_disable_encryption_() {
+  };
+
+  // incomplete
+  public String irciot_crypto_hasher_(byte[] in_password, int in_hash_size) {
+    boolean gen_RND = false;
+    if (in_password == null) { gen_RND = true;
+    } else if (in_password.length == 0) gen_RND = true;
+    if (!(this.crypt_model != CONST.crypt_NO_ENCRYPTION) ||
+      (!this.mid_method.isEmpty())) gen_RND = true;
+    if (gen_RND) {
+      String my_RHASH = new String("");
+
+      return my_RHASH;
+    };
+    String my_HASH = new String("");
+    if (in_hash_size == 16) {
+      my_HASH = DigestUtils.md5Hex(in_password);
+    } else if (in_hash_size == 20) {
+      my_HASH = DigestUtils.sha1Hex(in_password);
+    } else if (in_hash_size == 28) {
+
+    } else if (in_hash_size == 32) {
+      my_HASH = DigestUtils.sha256Hex(in_password);
+    } else if (in_hash_size == 48) {
+      my_HASH = DigestUtils.sha384Hex(in_password);
+    } else if (in_hash_size == 64) {
+      my_HASH = DigestUtils.sha512Hex(in_password);
+    } else if (in_hash_size == 160) {
+
+    };
+    return my_HASH;
+  };
 
   public String irciot_decrypt_datum_(JSONObject in_datum,
     Sextet<String, String, String, String, Integer, Integer> in_header,
