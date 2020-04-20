@@ -11,6 +11,7 @@ export SCRIPT_BUILD="./my_build.sh"
 export CLASSPATH="/usr/share/java"
 export CLASSPATH="${CLASSPATH}:/usr/share/java/json-simple-1.1.1.jar"
 export CLASSPATH="${CLASSPATH}:/usr/share/java/javatuples.jar"
+export CLASSPATH="${CLASSPATH}:/usr/share/java/commons-codec.jar"
 export JAVA_OPTIONS="-Djava.net.preferIPv4Stack=true"
 
 if [ -x "${BINARY_DIRNAME}" ]; then

@@ -25,7 +25,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -957,6 +960,20 @@ public class jlayerirciot {
   public void irciot_disable_encryption_() {
   };
 
+  public String irciot_crypto_security_hasher_(byte[] in_password, String in_algo) {
+    try {
+      MessageDigest my_md = MessageDigest.getInstance(in_algo);
+      BigInteger my_bi = new BigInteger(1, in_password);
+      String my_HASH = my_bi.toString(16);
+      while (my_HASH.length() < 32) my_HASH = "0" + my_HASH;
+      return my_HASH;
+    } catch (NoSuchAlgorithmException my_ex) {
+      return "";
+    } catch (Exception my_ex) {
+      return "";
+    }
+  };
+
   // incomplete
   public String irciot_crypto_hasher_(byte[] in_password, int in_hash_size) {
     boolean gen_RND = false;
@@ -975,7 +992,7 @@ public class jlayerirciot {
     } else if (in_hash_size == 20) {
       my_HASH = DigestUtils.sha1Hex(in_password);
     } else if (in_hash_size == 28) {
-
+      my_HASH = this.irciot_crypto_security_hasher_(in_password, "SHA-224");
     } else if (in_hash_size == 32) {
       my_HASH = DigestUtils.sha256Hex(in_password);
     } else if (in_hash_size == 48) {
@@ -987,6 +1004,7 @@ public class jlayerirciot {
     };
     return my_HASH;
   };
+  // End of irciot_crypto_hasher_()
 
   public String irciot_decrypt_datum_(JSONObject in_datum,
     Sextet<String, String, String, String, Integer, Integer> in_header,
@@ -1372,12 +1390,20 @@ public class jlayerirciot {
     // IRC-IoT messages of this type should be sent directly
     // to the user using private sending, but now they are passed
     // to the common message flow and appear in the channel
+    List<Pair<String, String>> my_packs
+      = this.irciot_blockchain_request_to_messages_(in_vuid);
+    if (my_packs.size() == 0) return;
+    Pair<String, String> my_compat = this.irciot_compatibility_();
 
   };
   // End of irciot_blockchain_request_foreign_key_()
 
   // incomplete
   public void irciot_encryption_request_foreign_key_(String in_vuid) {
+    List<Pair<String, String>> my_packs
+      = this.irciot_encryption_request_to_messages_(in_vuid);
+    if (my_packs.size() == 0) return;
+    Pair<String, String> my_compat = this.irciot_compatibility_();
 
   };
   // End of irciot_encryption_request_foreign_key_()
