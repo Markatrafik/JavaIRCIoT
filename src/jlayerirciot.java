@@ -890,6 +890,7 @@ public class jlayerirciot {
 
         };
         int my_compress = this.irciot_crypto_get_compress_(my_crypt_method);
+        String out_json = new String("");
         if (my_compress == CONST.compress_NONE) {
 
         } else if (my_compress == CONST.compress_ZLIB) {
@@ -899,11 +900,21 @@ public class jlayerirciot {
         } else return "";
         try {
           // Adding missing fields to the "Datum" from parent object
-
-          //
+          JSONParser my_parser = new JSONParser();
+          JSONObject my_datum  = (JSONObject) my_parser.parse(out_json);
+          if ((!my_datum.containsKey(CONST.tag_OBJECT_TYPE)) && (my_ot != null))
+            my_datum.put(CONST.tag_OBJECT_TYPE, my_ot);
+          if ((!my_datum.containsKey(CONST.tag_DATE_TIME)) && (my_dt != null))
+            my_datum.put(CONST.tag_DATE_TIME, my_dt);
+          if ((!my_datum.containsKey(CONST.tag_SRC_ADDR)) && (my_src != null))
+            my_datum.put(CONST.tag_SRC_ADDR, my_src);
+          if ((!my_datum.containsKey(CONST.tag_DST_ADDR)) && (my_src != null))
+            my_datum.put(CONST.tag_DST_ADDR, my_dst);
+          this.irciot_check_datum_(my_datum, in_vuid, my_ot);
+          return my_datum.toString();
         } catch (Exception my_ex) {
           return "";
-        };
+        }
       } else return "";
       this.irciot_clear_defrag_chain_(my_did);
       return "";
@@ -915,6 +926,7 @@ public class jlayerirciot {
 
   // incomplete
   boolean irciot_load_blockchain_methods_(String in_mid_method) {
+    if (in_mid_method == null) return false;
 
     return false;
   };
@@ -922,19 +934,37 @@ public class jlayerirciot {
 
   // incomplete
   boolean irciot_load_encryption_methods_(String in_crypt_method) {
+    if (in_crypt_method == null) return false;
 
     return false;
   };
   // End of irciot_load_encryption_methods_()
 
   // incomplete
-  boolean irciot_load_compression_methods_(String in_compress_method) {
+  boolean irciot_load_compression_methods_(String in_crypt_method) {
+    if (in_crypt_method == null) return false;
+    int my_compress = this.irciot_crypto_get_compress_(in_crypt_method);
+    try {
+      if (my_compress == CONST.compress_ZLIB) {
+        if (this.crypt_ZLIB != null) return false;
 
-    return false;
+      } else if (my_compress == CONST.compress_BZIP2) {
+        if (this.crypt_BZ2 != null) return false;
+
+      } else return false;
+    } catch (Exception my_ex) {
+      return false;
+    };
+    return true;
   };
   // End of irciot_load_compression_methods_()
 
+  // incomplete
   public void irciot_init_blockchain_method_(String in_mid_method) {
+    if (in_mid_method == null) return;
+    if (!in_mid_method.equals(CONST.tag_mid_ED25519) &&
+        !in_mid_method.equals(CONST.tag_mid_RSA1024) &&
+        !in_mid_method.equals(CONST.tag_mid_GOST12)) return;
 
   };
   // End of irciot_init_blocchain_method_()
@@ -949,15 +979,21 @@ public class jlayerirciot {
 
   // incomplete
   public void irciot_enable_encryption_(String in_crypt_method) {
+    this.irciot_load_encryption_methods_(in_crypt_method);
+    this.irciot_load_compression_methods_(in_crypt_method);
 
   };
 
-  // incomplete
   public void irciot_disable_blockchain_() {
+    this.mid_method = new String("");
+    this.blockchain_key_published = CONST.BCHT;
+    int my_mid = this.random.nextInt(89999) + 10000;
+    this.current_mid = String.valueOf(my_mid);
   };
 
-  // incomplete
   public void irciot_disable_encryption_() {
+    this.mid_method = new String("");
+    this.encryption_key_published = CONST.ENCT;
   };
 
   public String irciot_crypto_security_hasher_(byte[] in_password, String in_algo) {
