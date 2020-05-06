@@ -66,7 +66,7 @@ public class jlayerirciot {
    //
    private static final long serialVersionUID = 32767;
    //
-   public String irciot_library_version = "0.0.191";
+   public String irciot_library_version = "0.0.195";
    //
    public String irciot_protocol_version = "0.3.33";
    //
@@ -603,7 +603,7 @@ public class jlayerirciot {
    String in_vuid, String in_addon) {
     // Warning: This version of error handler is made for
     // testing and does not comply with the specification
-    String my_message = "";
+    String my_message = new String("");
     //
 
 
@@ -721,7 +721,7 @@ public class jlayerirciot {
     int my_err = 0;
     int my_ok  = 0;
     boolean my_fragments = false;
-    String defrag_buffer = "";
+    String defrag_buffer = new String("");
     List<Pair<Integer, String>> defrag_array = new ArrayList<>();
     Iterator<Triplet<String, Object, String>> my_iterator
       = this.defrag_pool.iterator();
@@ -908,7 +908,7 @@ public class jlayerirciot {
             my_datum.put(CONST.tag_DATE_TIME, my_dt);
           if ((!my_datum.containsKey(CONST.tag_SRC_ADDR)) && (my_src != null))
             my_datum.put(CONST.tag_SRC_ADDR, my_src);
-          if ((!my_datum.containsKey(CONST.tag_DST_ADDR)) && (my_src != null))
+          if ((!my_datum.containsKey(CONST.tag_DST_ADDR)) && (my_dst != null))
             my_datum.put(CONST.tag_DST_ADDR, my_dst);
           this.irciot_check_datum_(my_datum, in_vuid, my_ot);
           return my_datum.toString();
@@ -1300,16 +1300,36 @@ public class jlayerirciot {
   };
 
   // incomplete
-  public String irciot_encap_internal_(String in_datumset) {
+  public String irciot_encap_internal_(String in_datumset, String in_vuid) {
+    /* First/simple implementation of IRC-IoT "Datum" set encapsulator */
+    JSONArray my_datums = null;
+    JSONObject my_datum = null;
     try {
       JSONParser my_parser = new JSONParser();
-      JSONObject my_datums = (JSONObject) my_parser.parse(in_datumset);
+      Object my_object = my_parser.parse(in_datumset);
+      if (my_object != null) {
+        if (my_object instanceof JSONArray)
+          my_datums = (JSONArray) my_object;
+        else
+          my_datum = (JSONObject) my_object;
+      } else return "";
     } catch (Exception my_ex) {
       my_ex.printStackTrace();
       return "";
     };
-    String my_irciot = "";
+    String my_irciot = new String("");
+    String my_ot = null;
+    String my_src = null;
+    String my_dst = null;
+    if (my_datums != null && my_datum == null) {
+      int my_datums_cnt = 0;
+      int my_ot_cnt = 0;
+      int my_src_cnt = 0;
+      int my_dst_cnt = 0;
 
+    } else if (my_datums == null && my_datum != null) {
+
+    } else return "";
 
     return my_irciot;
   };
@@ -1456,7 +1476,7 @@ public class jlayerirciot {
       this.irciot_encryption_check_publication_();
     };
     Triplet<String, Integer, Integer> my_encap;
-    String json_text = "";
+    String json_text = new String("");
     int my_skip = 0;
     int my_part = 0;
     if (this.crypt_model == CONST.crypt_NO_ENCRYPTION) {
@@ -1507,7 +1527,7 @@ public class jlayerirciot {
 
   public Triplet<String, Integer, Integer> irciot_encap_(String in_datumset,
    int in_skip, int in_part, String in_vuid) {
-    String my_irciot = "";
+    String my_irciot = new String("");
     String my_datumset = in_datumset;
     boolean my_encrypt = false;
     int my_datums_skip = 0;
@@ -1551,7 +1571,7 @@ public class jlayerirciot {
         return Triplet.with("", 0, 0);
       };
     }; // in_skip
-    my_irciot = this.irciot_encap_internal_(my_datumset);
+    my_irciot = this.irciot_encap_internal_(my_datumset, in_vuid);
     if ((my_irciot.length() > this.message_mtu) || my_encrypt) {
       if (in_skip == 0)
         this.current_mid = save_mid; // mid rollback
@@ -1585,7 +1605,7 @@ public class jlayerirciot {
             if (part_datums.size() == 0) break;
             String str_part_datums = part_datums.toJSONString();
             this.current_mid = save_mid; // mid rollback
-            my_irciot = this.irciot_encap_internal_(str_part_datums);
+            my_irciot = this.irciot_encap_internal_(str_part_datums, in_vuid);
             if (my_irciot.length() <= this.message_mtu) {
               int my_skip_out = in_skip + my_datums_skip;
               if (my_skip_out >= my_total)
