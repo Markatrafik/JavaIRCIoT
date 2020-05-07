@@ -539,10 +539,6 @@ public class jlayerirciot {
   public int    current_oid =  0 ; // Object ID
   public int    current_did =  0 ; // Datum ID
   //
-  public int mid_lock = 0;
-  public int oid_lock = 0;
-  public int did_lock = 0;
-  //
   public List<Triplet<String, Object, String>> defrag_pool;
   public boolean defrag_lock = false;
   //
