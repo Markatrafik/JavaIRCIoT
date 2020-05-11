@@ -66,7 +66,7 @@ public class jlayerirciot {
    //
    private static final long serialVersionUID = 32767;
    //
-   public String irciot_library_version = "0.0.195";
+   public String irciot_library_version = "0.0.197";
    //
    public String irciot_protocol_version = "0.3.33";
    //
@@ -546,11 +546,11 @@ public class jlayerirciot {
   public boolean output_lock = false;
   //
   public String  ldict_file  = null;
-  public boolean ldict_lock  = false;
+  protected boolean ldict_lock  = false;
   //
-  public String mid_method = CONST.tag_mid_default;
-  public int    oid_method = 0;
-  public int    did_method = 0;
+  protected String mid_method = CONST.tag_mid_default;
+  protected int    oid_method = 0;
+  protected int    did_method = 0;
   //
   public String crypt_method = CONST.tag_ENC_default;
   public int crypt_model = this.irciot_crypto_get_model_(crypt_method);
@@ -565,9 +565,9 @@ public class jlayerirciot {
   public Object crypt_ZLIB = (Object) null;
   public Object crypt_BZ2  = (Object) null;
   //
-  public int blockchain_key_published = 0;
+  protected int blockchain_key_published = 0;
   //
-  public int encryption_key_published = 0;
+  protected int encryption_key_published = 0;
   //
   public int message_mtu = CONST.default_mtu;
   //
@@ -1423,6 +1423,15 @@ public class jlayerirciot {
     //   this.encryption_public_key, CONST.ot_ENC_INFO
     // );
 
+  };
+  // End of irciot_encryption_check_publication_()
+
+  public boolean irciot_blockchain_is_key_published_() {
+    return (this.blockchain_key_published > 0);
+  };
+
+  public boolean irciot_encryption_is_key_published_() {
+    return (this.encryption_key_published > 0);
   };
 
   // incomplete

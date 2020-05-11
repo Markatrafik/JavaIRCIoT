@@ -59,7 +59,7 @@ public class jlayerirc implements Runnable {
 
   public static final class init_constants {
    //
-   public String irciot_library_version = "0.0.195";
+   public String irciot_library_version = "0.0.197";
    //
    public String irciot_protocol_version = "0.3.33";
    //
