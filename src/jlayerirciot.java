@@ -46,7 +46,6 @@ public class jlayerirciot {
 
   // Those Global options override default behavior and memory usage:
   //
-  public static final boolean CAN_debug_library  = false;
   // Creating a chain of cryptographic signatures:
   public static final boolean CAN_mid_blockchain = false;
   // Ability to encrypt and decrypt of "Datums":
@@ -61,12 +60,13 @@ public class jlayerirciot {
   // Automatic loading of necessary modules:
   public static final boolean DO_auto_blockchain = false;
   public static final boolean DO_auto_compress   = false;
+  public static final boolean DO_debug_library   = false;
 
   public static final class init_constants {
    //
    private static final long serialVersionUID = 32767;
    //
-   public String irciot_library_version = "0.0.197";
+   public String irciot_library_version = "0.0.203";
    //
    public String irciot_protocol_version = "0.3.33";
    //
@@ -145,6 +145,13 @@ public class jlayerirciot {
    public String tag_ENC_B64_USER  = "b64u";
    public String tag_ENC_B85_USER  = "b85u";
    //
+   // Basecoding + Two Stage Encryption:
+   //
+   public String tag_ENC_B64_RSA_AES   = "6ra";
+   public String tag_ENC_B85_RSA_AES   = "8ra";
+   public String tag_ENC_B64_RSA_2FISH = "6rf";
+   public String tag_ENC_B85_RSA_2FISH = "8rf";
+   //
    // Basecoding + Encryption + Compression:
    //
    public String tag_ENC_B64Z_RSA   = "b64Z";
@@ -155,6 +162,13 @@ public class jlayerirciot {
    public String tag_ENC_B85Z_2FISH = "b85F";
    public String tag_ENC_B64Z_USER  = "b64U";
    public String tag_ENC_B85Z_USER  = "b85U";
+   //
+   // Basecoding + Two Stage Encryption + Compression:
+   //
+   public String tag_ENC_B64Z_RSA_AES   = "6raz";
+   public String tag_ENC_B85Z_RSA_AES   = "8raz";
+   public String tag_ENC_B64Z_RSA_2FISH = "6rfz";
+   public String tag_ENC_B85Z_RSA_2FISH = "8rfz";
    //
    //
    public String[] tag_ALL_BASE32_ENC = new String[] {
@@ -172,7 +186,11 @@ public class jlayerirciot {
      tag_ENC_B64_RSA,
      tag_ENC_B64Z_RSA,
      tag_ENC_B64_2FISH,
-     tag_ENC_B64Z_2FISH
+     tag_ENC_B64Z_2FISH,
+     tag_ENC_B64_RSA_AES,
+     tag_ENC_B64Z_RSA_AES,
+     tag_ENC_B64_RSA_2FISH,
+     tag_ENC_B64Z_RSA_2FISH
    };
    //
    public String[] tag_ALL_BASE85_ENC = new String[] {
@@ -182,7 +200,11 @@ public class jlayerirciot {
      tag_ENC_B85_AES,
      tag_ENC_B85Z_AES,
      tag_ENC_B85_2FISH,
-     tag_ENC_B85Z_2FISH
+     tag_ENC_B85Z_2FISH,
+     tag_ENC_B85_RSA_AES,
+     tag_ENC_B85Z_RSA_AES,
+     tag_ENC_B85_RSA_2FISH,
+     tag_ENC_B85Z_RSA_2FISH
    };
    //
    public String[] tag_ALL_BASE122_ENC = new String[] {
@@ -199,7 +221,11 @@ public class jlayerirciot {
      tag_ENC_B64_AES,
      tag_ENC_B85_AES,
      tag_ENC_B64_2FISH,
-     tag_ENC_B85_2FISH
+     tag_ENC_B85_2FISH,
+     tag_ENC_B64_RSA_AES,
+     tag_ENC_B85_RSA_AES,
+     tag_ENC_B64_RSA_2FISH,
+     tag_ENC_B85_RSA_2FISH
    };
    //
    public String[] tag_ALL_ZLIB_ENC = new String[] {
@@ -210,7 +236,11 @@ public class jlayerirciot {
      tag_ENC_B64Z_AES,
      tag_ENC_B85Z_AES,
      tag_ENC_B64Z_2FISH,
-     tag_ENC_B85Z_2FISH
+     tag_ENC_B85Z_2FISH,
+     tag_ENC_B64Z_RSA_AES,
+     tag_ENC_B85Z_RSA_AES,
+     tag_ENC_B64Z_RSA_2FISH,
+     tag_ENC_B85Z_RSA_2FISH
    };
    //
    public String[] tag_ALL_BZIP2_ENC = new String[] {
@@ -223,21 +253,37 @@ public class jlayerirciot {
      tag_ENC_B64_RSA,
      tag_ENC_B85_RSA,
      tag_ENC_B64Z_RSA,
-     tag_ENC_B85Z_RSA
+     tag_ENC_B85Z_RSA,
+     tag_ENC_B64_RSA_AES,
+     tag_ENC_B85_RSA_AES,
+     tag_ENC_B64Z_RSA_AES,
+     tag_ENC_B85Z_RSA_AES,
+     tag_ENC_B64_RSA_2FISH,
+     tag_ENC_B85_RSA_2FISH,
+     tag_ENC_B64Z_RSA_2FISH,
+     tag_ENC_B85Z_RSA_2FISH
   };
   //
   public String[] tag_ALL_AES_ENC = new String[] {
      tag_ENC_B64_AES,
      tag_ENC_B85_AES,
      tag_ENC_B64Z_AES,
-     tag_ENC_B85Z_AES
+     tag_ENC_B85Z_AES,
+     tag_ENC_B64_RSA_AES,
+     tag_ENC_B85_RSA_AES,
+     tag_ENC_B64Z_RSA_AES,
+     tag_ENC_B85Z_RSA_AES
   };
   //
   public String[] tag_ALL_2FISH_ENC = new String[] {
      tag_ENC_B64_2FISH,
      tag_ENC_B85_2FISH,
      tag_ENC_B64Z_2FISH,
-     tag_ENC_B85Z_2FISH
+     tag_ENC_B85Z_2FISH,
+     tag_ENC_B64_RSA_2FISH,
+     tag_ENC_B85_RSA_2FISH,
+     tag_ENC_B64Z_RSA_2FISH,
+     tag_ENC_B85Z_RSA_2FISH
   };
   //
   public String[] tag_ALL_nocrypt_ENC = new String[] {
@@ -253,6 +299,17 @@ public class jlayerirciot {
      tag_ENC_B85_BZIP2
    };
    //
+   public String[] tag_ALL_two_stage_ENC = new String[] {
+     tag_ENC_B64_RSA_AES,
+     tag_ENC_B85_RSA_AES,
+     tag_ENC_B64_RSA_2FISH,
+     tag_ENC_B85_RSA_2FISH,
+     tag_ENC_B64Z_RSA_AES,
+     tag_ENC_B85Z_RSA_AES,
+     tag_ENC_B64Z_RSA_2FISH,
+     tag_ENC_B85Z_RSA_2FISH
+   };
+   //
    // Blockchain signing methods:
    //
    public String tag_mid_ED25519   = "ed"; // RFC 8032
@@ -263,6 +320,7 @@ public class jlayerirciot {
    //
    public int mid_ED25519_hash_length = 88;
    public int mid_RSA1024_hash_length = 173;
+   public int mid_GOST12_hash_length  = 173;
    //
    public String tag_ENC_default = tag_ENC_BASE64;
    //
@@ -838,7 +896,7 @@ public class jlayerirciot {
       if (my_ok == 1) {
       } else if (my_ok == 2) {
         this.irciot_clear_defrag_chain_(my_did);
-        if (CAN_debug_library)
+        if (DO_debug_library)
           System.out.println("\033[1;42m DEFRAGMENTATION COMPLETED \033[0m");
         String my_crypt_method = this.crypt_method;
         if (CONST.ot_ENC_INFO.equals(my_ot)
