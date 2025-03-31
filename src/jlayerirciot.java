@@ -22,6 +22,7 @@ import java.util.Random;
 import java.util.Iterator;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
@@ -66,7 +67,7 @@ public class jlayerirciot {
    //
    private static final long serialVersionUID = 32767;
    //
-   public String irciot_library_version = "0.0.219";
+   public String irciot_library_version = "0.0.225";
    //
    public String irciot_protocol_version = "0.3.33";
    //
@@ -603,7 +604,10 @@ public class jlayerirciot {
   public List<Pair<String, String>> output_pool;
   public boolean output_lock = false;
   //
-  public String  ldict_file  = null;
+  public String ldict_file = null;
+  //
+  private List<Map<String, Object>> ldict;
+  //
   protected boolean ldict_lock  = false;
   //
   protected String mid_method = CONST.tag_mid_default;
@@ -637,6 +641,7 @@ public class jlayerirciot {
   //
   public jlayerirciot() { // Class constructor
     this.random = new Random();
+    this.ldict  = new ArrayList<>();
 
   };
 
@@ -1710,5 +1715,21 @@ public class jlayerirciot {
     return Triplet.with(my_irciot, in_skip + my_datums_skip, my_datums_part);
   };
   // End of irciot_encap_()
+
+  public int irciot_ldict_get_item_max_id_() {
+    int my_max_id = 0;
+    for (Map<String, Object> my_ldict_item : ldict) {
+      Object my_id_obj = my_ldict_item.get(CONST.ldict_ITEM_ID);
+      int my_id = 0;
+      if (my_id_obj instanceof Integer) {
+        my_id = (Integer) my_id_obj;
+      };
+      if (my_max_id < my_id) {
+        my_max_id = my_id;
+      };
+    };
+    return my_max_id;
+  };
+  // End of irciot_ldict_get_item_max_id
 
 }
